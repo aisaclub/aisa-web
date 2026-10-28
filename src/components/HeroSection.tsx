@@ -59,7 +59,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenGame, onOpenVide
                 className="flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-bold text-sm font-space shadow-xl shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 <PlayCircle className="w-5 h-5 text-white" />
-                <span>TONTON TEASER 15S</span>
+                <span>TONTON PENGENALAN RASMI (15S)</span>
               </button>
 
               {/* Play Mini-Game */}
@@ -68,7 +68,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenGame, onOpenVide
                 className="flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/40 text-cyan-300 hover:text-white font-bold text-sm font-space hover:border-cyan-400 transition-all group"
               >
                 <Gamepad2 className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
-                <span>MAIN GAME: EPOCH RUSH</span>
+                <span>MODUL SIMULASI & GAME AI</span>
               </button>
             </div>
 

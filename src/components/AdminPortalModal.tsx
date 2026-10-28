@@ -40,7 +40,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'profile' | 'registrations' | 'announcement' | 'activity' | 'subscribers' | 'cloudflare'>('profile');
 
-  // 1. Profile Edit State & Auto-save (3 Detik)
+  // 1. Profile Edit State & 3-Second Ticking Auto-save (Tiada Butang Simpan)
   const [selectedMemberId, setSelectedMemberId] = useState<string>(
     initialEditMember ? initialEditMember.id : members[0]?.id || ''
   );
@@ -50,9 +50,22 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
     return initialEditMember || currentMember || ({} as CommitteeMember);
   });
 
-  const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'typing' | 'saving'>('saved');
-  const isFirstRender = useRef(true);
+  const [countdown, setCountdown] = useState<number>(0);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'counting' | 'saving'>('saved');
+  const countdownIntervalRef = useRef<any>(null);
   const autoSaveTimerRef = useRef<any>(null);
+
+  // Sync when initialEditMember prop changes (e.g. clicked from OrgTreeChart)
+  useEffect(() => {
+    if (initialEditMember) {
+      setSelectedMemberId(initialEditMember.id);
+      setProfileForm({ ...initialEditMember });
+      setAutoSaveStatus('saved');
+      setCountdown(0);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    }
+  }, [initialEditMember]);
 
   const handleSelectMember = (id: string) => {
     setSelectedMemberId(id);
@@ -60,37 +73,40 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
     if (target) {
       setProfileForm({ ...target });
       setAutoSaveStatus('saved');
+      setCountdown(0);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     }
   };
 
-  // Auto-Save Effect (3 Detik / 3000ms delay debounce)
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+  // Triggered on any input change or photo upload
+  const handleProfileFieldChange = (field: keyof CommitteeMember, value: any) => {
+    const updated = { ...profileForm, [field]: value };
+    setProfileForm(updated);
 
-    if (!profileForm.id) return;
+    // Clear existing timers
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
 
-    setAutoSaveStatus('typing');
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
+    setAutoSaveStatus('counting');
+    setCountdown(3);
 
-    autoSaveTimerRef.current = setTimeout(() => {
-      setAutoSaveStatus('saving');
-      onUpdateMember(profileForm);
-      setTimeout(() => {
-        setAutoSaveStatus('saved');
-      }, 600);
-    }, 3000);
-
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
+    let remainingSeconds = 3;
+    countdownIntervalRef.current = setInterval(() => {
+      remainingSeconds -= 1;
+      if (remainingSeconds > 0) {
+        setCountdown(remainingSeconds);
+      } else {
+        clearInterval(countdownIntervalRef.current);
+        setCountdown(0);
+        setAutoSaveStatus('saving');
+        onUpdateMember(updated);
+        setTimeout(() => {
+          setAutoSaveStatus('saved');
+        }, 500);
       }
-    };
-  }, [profileForm]);
+    }, 1000);
+  };
 
   // 2. Announcement Form State (1-2 Images, Date Picker)
   const [newAnn, setNewAnn] = useState<Partial<Announcement>>({
@@ -354,104 +370,163 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
 
         {/* Scrollable Tab Content */}
         <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-          {/* TAB 1: EXCO PROFILE UPDATE (AUTO-SAVE 3 DETIK, TIADA BUTTON SIMPAN) */}
+          {/* TAB 1: EXCO PROFILE UPDATE (LIVE PHOTO DISPLAY, AUTO-SAVE 3 DETIK, TIADA BUTTON SIMPAN) */}
           {activeTab === 'profile' && (
             <div className="space-y-4">
-              {/* Member Picker & Live Auto-Save Status */}
-              <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex-1">
-                  <label className="text-xs font-bold text-slate-300 block mb-1 font-mono-code">
-                    PILIH NAMA EXCO UNTUK DIKEMAS KINI:
-                  </label>
-                  <select
-                    value={selectedMemberId}
-                    onChange={(e) => handleSelectMember(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
-                  >
-                    {members.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.role} - {m.name} ({m.department})
-                      </option>
-                    ))}
-                  </select>
+              {/* Member Picker & Dynamic 3-Second Countdown Auto-Save Status */}
+              <div className="bg-slate-950/80 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex-1">
+                    <label className="text-xs font-bold text-slate-300 block mb-1 font-mono-code flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>SILA PILIH ANGGOTA JAWATANKUASA UNTUK KEMAS KINI:</span>
+                    </label>
+                    <select
+                      value={selectedMemberId}
+                      onChange={(e) => handleSelectMember(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-medium"
+                    >
+                      {members.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.role} — {m.name} ({m.department})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* 3-Second Countdown Status Indicator */}
+                  <div className="shrink-0 flex items-center gap-2 self-start sm:self-end">
+                    {autoSaveStatus === 'counting' && (
+                      <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-mono-code shadow-lg shadow-amber-500/10 animate-pulse">
+                        <Clock className="w-4 h-4 text-amber-400 animate-spin" />
+                        <div>
+                          <span className="font-bold">Menyimpan automatik: </span>
+                          <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-xs">
+                            {countdown}s
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {autoSaveStatus === 'saving' && (
+                      <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-mono-code">
+                        <Sparkles className="w-4 h-4 text-indigo-400 animate-spin" />
+                        <span className="font-bold">Menyimpan rekod ke sistem...</span>
+                      </div>
+                    )}
+                    {autoSaveStatus === 'saved' && (
+                      <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-mono-code">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <span className="font-bold">Disimpan secara automatik</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Auto-Save Status Indicator */}
-                <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
-                  {autoSaveStatus === 'typing' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-mono-code animate-pulse">
-                      <Clock className="w-3.5 h-3.5 animate-spin" />
-                      <span>Sedang menaip... auto-save dalam 3 saat</span>
-                    </span>
-                  )}
-                  {autoSaveStatus === 'saving' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-mono-code">
-                      <Sparkles className="w-3.5 h-3.5 animate-spin" />
-                      <span>Menyimpan ke sistem...</span>
-                    </span>
-                  )}
-                  {autoSaveStatus === 'saved' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-mono-code">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Disimpan secara automatik (3 detik)</span>
-                    </span>
-                  )}
-                </div>
+                {/* Animated Countdown Progress Bar */}
+                {autoSaveStatus === 'counting' && (
+                  <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-amber-500/20">
+                    <div
+                      className="bg-gradient-to-r from-amber-400 to-indigo-500 h-full transition-all duration-1000 ease-linear rounded-full"
+                      style={{ width: `${(countdown / 3) * 100}%` }}
+                    />
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Nama Penuh</label>
-                  <input
-                    type="text"
-                    value={profileForm.name}
-                    onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
-                    required
-                  />
+              {/* LIVE PHOTO DISPLAY BEFORE SAVE BOX */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-slate-950 border border-indigo-500/30 flex flex-col sm:flex-row items-center gap-4">
+                {/* Photo Display Card */}
+                <div className="relative shrink-0">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-indigo-500/60 bg-slate-950 shadow-xl shadow-indigo-500/20 flex items-center justify-center group">
+                    {profileForm.photoUrl ? (
+                      <img
+                        src={profileForm.photoUrl}
+                        alt={profileForm.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+                        }}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-2 text-center text-slate-500">
+                        <User className="w-8 h-8 text-slate-600 mb-1" />
+                        <span className="text-[9px] font-mono-code">Tiada Foto</span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-indigo-600 text-[9px] font-black font-mono-code text-white whitespace-nowrap shadow-md">
+                    LIVE DISPLAY
+                  </span>
                 </div>
 
-                <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Jawatan / Gelaran</label>
-                  <input
-                    type="text"
-                    value={profileForm.role}
-                    onChange={(e) => setProfileForm({ ...profileForm, role: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
-                    required
-                  />
-                </div>
+                {/* Photo Controls: URL input and Upload button */}
+                <div className="flex-1 space-y-2 w-full">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-300 font-mono-code flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>FOTO PROFIL EXCO (PAPARAN TERUS SEBELUM SIMPAN):</span>
+                    </label>
+                    <span className="text-[10px] text-cyan-400 font-mono-code">
+                      {profileForm.photoUrl ? 'Foto Berjaya Dipaparkan' : 'Pilih Fail atau Masukkan Pautan'}
+                    </span>
+                  </div>
 
-                {/* Profile Photo with Upload or URL */}
-                <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Gambar Profil (Upload / URL)</label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="url"
                       value={profileForm.photoUrl}
-                      onChange={(e) => setProfileForm({ ...profileForm, photoUrl: e.target.value })}
-                      placeholder="https://images.unsplash.com/..."
-                      className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      onChange={(e) => handleProfileFieldChange('photoUrl', e.target.value)}
+                      placeholder="Tampal pautan URL imej (https://...)"
+                      className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono-code"
                     />
-                    <label className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 cursor-pointer flex items-center gap-1 shrink-0">
+                    <label className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white cursor-pointer flex items-center justify-center gap-1.5 shrink-0 transition-colors shadow-md shadow-indigo-600/30">
                       <Upload className="w-3.5 h-3.5" />
-                      <span>Upload</span>
+                      <span>Muat Naik Foto</span>
                       <input
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => handleFileUpload(e, (url) => setProfileForm({ ...profileForm, photoUrl: url }))}
+                        onChange={(e) => handleFileUpload(e, (url) => handleProfileFieldChange('photoUrl', url))}
                       />
                     </label>
                   </div>
+                  <p className="text-[11px] text-slate-400">
+                    Sebarang pertukaran imej akan dipaparkan serta-merta pada kotak di sebelah kiri dan disimpan secara automatik dalam tempoh 3 saat.
+                  </p>
+                </div>
+              </div>
+
+              {/* Form Input Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1">Nama Penuh Mahasiswa *</label>
+                  <input
+                    type="text"
+                    value={profileForm.name}
+                    onChange={(e) => handleProfileFieldChange('name', e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    required
+                  />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Program & Semester</label>
+                  <label className="text-xs font-bold text-slate-400 block mb-1">Jawatan / Gelaran Rasmi *</label>
+                  <input
+                    type="text"
+                    value={profileForm.role}
+                    onChange={(e) => handleProfileFieldChange('role', e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1">Program & Semester Akademik</label>
                   <input
                     type="text"
                     value={profileForm.yearProgram}
-                    onChange={(e) => setProfileForm({ ...profileForm, yearProgram: e.target.value })}
+                    onChange={(e) => handleProfileFieldChange('yearProgram', e.target.value)}
+                    placeholder="cth: CS251 (Sarjana Muda Sains Komputer) • Semester 4"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -459,12 +534,12 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                 {/* Bidang Minat Penyelidikan AI (DROPDOWN PILIH JE) */}
                 <div>
                   <label className="text-xs font-bold text-slate-400 block mb-1 flex items-center justify-between">
-                    <span>Bidang Minat Penyelidikan AI (Dropdown)</span>
-                    <span className="text-[10px] text-cyan-400 font-mono-code">Pilih Terus</span>
+                    <span>Bidang Minat Penyelidikan AI (Pilih Terus)</span>
+                    <span className="text-[10px] text-cyan-400 font-mono-code">Dropdown Senarai Rasmi</span>
                   </label>
                   <select
                     value={profileForm.aiSpecialty}
-                    onChange={(e) => setProfileForm({ ...profileForm, aiSpecialty: e.target.value })}
+                    onChange={(e) => handleProfileFieldChange('aiSpecialty', e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                   >
                     {AI_RESEARCH_FIELDS.map((field) => (
@@ -476,34 +551,49 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Emel Pelajar / Rasmi</label>
+                  <label className="text-xs font-bold text-slate-400 block mb-1">Emel Rasmi Mahasiswa / Siswa UiTM</label>
                   <input
                     type="email"
                     value={profileForm.email}
-                    onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    onChange={(e) => handleProfileFieldChange('email', e.target.value)}
+                    placeholder="nomborpelajar@isiswa.uitm.edu.my"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono-code"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1">Profil LinkedIn (Pilihan)</label>
+                  <input
+                    type="url"
+                    value={profileForm.linkedin || ''}
+                    onChange={(e) => handleProfileFieldChange('linkedin', e.target.value)}
+                    placeholder="https://linkedin.com/in/..."
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono-code"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Bio / Pengenalan Diri Ringkas</label>
+                <label className="text-xs font-bold text-slate-400 block mb-1">Bio / Pengenalan Diri & Visi Jawatankuasa</label>
                 <textarea
                   rows={3}
                   value={profileForm.bio}
-                  onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
+                  onChange={(e) => handleProfileFieldChange('bio', e.target.value)}
+                  placeholder="Nyatakan aspirasi, fokus projek, atau kepakaran anda dalam memacu inovasi AISA..."
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
-              {/* Informative Auto-Save Note (Button Simpan Dibuang) */}
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span className="flex items-center gap-1.5 font-mono-code text-[11px]">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Sistem auto-save aktif: Sebarang perubahan disimpan automatik dalam tempoh 3 saat tanpa perlu klik butang.</span>
+              {/* Informative Auto-Save Note (Strictly Tiada Butang Simpan) */}
+              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+                <span className="flex items-center gap-2 font-mono-code text-[11px]">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    Sistem Auto-Save Pintar Diaktifkan: Sebarang perubahan profil atau muat naik foto disimpan secara automatik selepas 3 saat. Tiada butang simpan manual diperlukan.
+                  </span>
                 </span>
-                <span className="text-[10px] font-mono-code text-indigo-400 font-bold uppercase">
-                  STATUS: {autoSaveStatus.toUpperCase()}
+                <span className="shrink-0 text-[10px] font-mono-code text-indigo-400 font-bold px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 uppercase">
+                  STATUS: {autoSaveStatus === 'counting' ? `MENGIRA (${countdown}S)` : autoSaveStatus.toUpperCase()}
                 </span>
               </div>
             </div>

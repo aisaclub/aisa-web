@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { initialMembers, initialAnnouncements, initialActivities, initialAdvisors, initialRegistrations, initialSubscribers } from './data/initialData';
-import { CommitteeMember, Announcement, Activity, LecturerAdvisor, ClubRegistration, NoticeSubscriber, CustomEmailCampaign } from './types';
+import { CommitteeMember, Announcement, Activity, LecturerAdvisor, ClubRegistration, NoticeSubscriber, CustomEmailCampaign, WebThemeMode } from './types';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { OrgTreeChart } from './components/OrgTreeChart';
@@ -46,6 +46,23 @@ export function App() {
     const saved = localStorage.getItem('aisa_subscribers');
     return saved ? JSON.parse(saved) : initialSubscribers;
   });
+
+  // Theme Mode State (3 Modes: cyber_dark, soft_light, uitm_royal)
+  const [themeMode, setThemeMode] = useState<WebThemeMode>(() => {
+    return (localStorage.getItem('aisa_theme_mode') as WebThemeMode) || 'cyber_dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('aisa_theme_mode', themeMode);
+    document.documentElement.setAttribute('data-theme', themeMode);
+    if (themeMode === 'soft_light') {
+      document.body.className = 'theme-soft_light bg-[#f8fafc] text-slate-800';
+    } else if (themeMode === 'uitm_royal') {
+      document.body.className = 'theme-uitm_royal bg-[#120722] text-[#fdfaf3]';
+    } else {
+      document.body.className = 'bg-[#0b0f19] text-[#e2e8f0]';
+    }
+  }, [themeMode]);
 
   // 2. Modals and Admin State
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
@@ -191,7 +208,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070913] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+    <div className={`min-h-screen theme-${themeMode} bg-[#070913] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white transition-colors duration-200`}>
       {/* Top Banner if in Admin Mode */}
       {isAdmin && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 text-slate-950 font-bold font-mono-code text-[11px] py-1 px-4 text-center flex items-center justify-center gap-2 shadow-lg">
@@ -215,6 +232,8 @@ export function App() {
         onOpenGame={() => setIsGameOpen(true)}
         onOpenVideo={() => setIsVideoOpen(true)}
         onOpenAdminPortal={() => setIsAdminPortalOpen(true)}
+        themeMode={themeMode}
+        onThemeChange={setThemeMode}
       />
 
       {/* Main Content Sections */}

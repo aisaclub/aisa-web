@@ -94,6 +94,8 @@ export interface NoticeSubscriber {
   preferredTopic: string;
 }
 
+export type WebThemeMode = 'cyber_dark' | 'soft_light' | 'uitm_royal';
+
 export type EmailDesignStyle =
   | 'minimalist'       // 1. Swiss Clean Minimalist
   | 'glassmorphism'    // 2. Frosted Aurora Glass
