@@ -33,6 +33,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       subject: '[AISA UiTM Jasin] Pengesahan Langganan Buletin & Notis Rasmi',
       html: subHtml,
       apiKey: context.env.RESEND_API_KEY,
+      gmailRelayUrl: (context.env as any).GMAIL_RELAY_URL,
     });
 
     // 2. If Cloudflare D1 is available at the Edge

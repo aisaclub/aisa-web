@@ -7,6 +7,8 @@ export interface SendEmailOptions {
   html: string;
   apiKey?: string;
   fromName?: string;
+  gmailRelayUrl?: string;
+  replyTo?: string;
 }
 
 export async function sendRealEmail({
@@ -15,15 +17,40 @@ export async function sendRealEmail({
   html,
   apiKey,
   fromName = 'AISA UiTM Melaka Jasin',
+  gmailRelayUrl,
+  replyTo = 'aisaclub.uitmjasin@gmail.com',
 }: SendEmailOptions): Promise<{ sent: boolean; status: string; data?: any; error?: string }> {
-  // Read apiKey passed from Cloudflare Pages context.env.RESEND_API_KEY
+  // Method 1: Google Apps Script Webhook Relay (Sends DIRECTLY from aisaclub.uitmjasin@gmail.com for FREE)
+  if (gmailRelayUrl && gmailRelayUrl.trim() !== '') {
+    try {
+      const gRes = await fetch(gmailRelayUrl.trim(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to,
+          subject,
+          html,
+          fromName,
+          replyTo,
+        }),
+      });
+      const gJson = (await gRes.json()) as any;
+      if (gRes.ok && gJson.success) {
+        return { sent: true, status: 'DELIVERED_VIA_GMAIL', data: gJson };
+      }
+    } catch (gErr: any) {
+      console.warn('Gmail relay error, falling back to Resend if available:', gErr.message);
+    }
+  }
+
+  // Method 2: Resend API
   const effectiveKey = apiKey && apiKey.trim() !== '' ? apiKey.trim() : null;
 
   if (!effectiveKey) {
     return {
       sent: false,
       status: 'LOGGED_TO_D1_ONLY',
-      data: { message: 'Emel direkodkan ke D1 database. Tambah RESEND_API_KEY di Cloudflare Pages > Settings > Environment variables untuk penghantaran emel sebenar.' },
+      data: { message: 'Emel direkodkan ke D1 database. Tambah RESEND_API_KEY atau GMAIL_RELAY_URL di Cloudflare untuk penghantaran emel sebenar.' },
     };
   }
 
@@ -42,6 +69,7 @@ export async function sendRealEmail({
       },
       body: JSON.stringify({
         from: `${fromName} <onboarding@resend.dev>`,
+        reply_to: replyTo,
         to: [recipient],
         subject: subject,
         html: html,

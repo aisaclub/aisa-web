@@ -38,6 +38,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       subject: `[AISA UiTM Jasin] Kad Keahlian Digital & Pengesahan Ahli (${membershipId})`,
       html: welcomeHtml,
       apiKey: context.env.RESEND_API_KEY,
+      gmailRelayUrl: (context.env as any).GMAIL_RELAY_URL,
     });
 
     const db = context.env.DB || (context.env as any)['context.env.DB'];

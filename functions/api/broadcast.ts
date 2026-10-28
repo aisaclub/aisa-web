@@ -59,14 +59,15 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       // Deduplicate emails
       const uniqueEmails = Array.from(new Set(emailsToSend));
 
-      // Dispatch real email if RESEND_API_KEY is configured
-      if (context.env.RESEND_API_KEY && uniqueEmails.length > 0) {
+      const hasMailer = context.env.RESEND_API_KEY || (context.env as any).GMAIL_RELAY_URL;
+      if (hasMailer && uniqueEmails.length > 0) {
         for (const recipient of uniqueEmails) {
           await sendRealEmail({
             to: recipient,
             subject: campaign.subject,
             html: campaignHtml,
             apiKey: context.env.RESEND_API_KEY,
+            gmailRelayUrl: (context.env as any).GMAIL_RELAY_URL,
           });
           sentCount++;
         }
