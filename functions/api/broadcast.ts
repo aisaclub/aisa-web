@@ -1,8 +1,10 @@
 // Cloudflare Pages Function: /api/broadcast
 // Dispatches campaign and logs records into Cloudflare D1 email_logs
+import { sendRealEmail, renderBroadcastCampaignEmailHtml } from './_mailer';
 
 interface Env {
   DB?: any;
+  RESEND_API_KEY?: string;
 }
 
 export async function onRequestPost(context: { request: Request; env: Env }) {
@@ -16,18 +18,67 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       });
     }
 
+    const campaignHtml = renderBroadcastCampaignEmailHtml({
+      title: campaign.title,
+      subject: campaign.subject,
+      content: campaign.content || '',
+      date: campaign.eventDate,
+      time: campaign.eventTime,
+      location: campaign.eventLocation,
+      templateStyle: campaign.templateStyle || 'tech_summit',
+      senderRole: campaign.senderRole || 'Exco AISA',
+      senderName: campaign.senderName || 'Barisan Majlis Tertinggi AISA',
+    });
+
+    let sentCount = 0;
+
+    // If D1 is available, fetch real emails based on target audience
     if (context.env.DB) {
+      const target = campaign.targetAudience || 'all';
+      let emailsToSend: string[] = [];
+
+      if (target === 'subscribers' || target === 'all') {
+        const { results: subResults } = await context.env.DB.prepare('SELECT email FROM notice_subscribers').all();
+        if (subResults) {
+          emailsToSend.push(...subResults.map((r: any) => r.email));
+        }
+      }
+
+      if (target === 'members' || target === 'all') {
+        const { results: regResults } = await context.env.DB.prepare('SELECT email FROM club_registrations').all();
+        if (regResults) {
+          emailsToSend.push(...regResults.map((r: any) => r.email));
+        }
+      }
+
+      // Deduplicate emails
+      const uniqueEmails = Array.from(new Set(emailsToSend));
+
+      // Dispatch real email if RESEND_API_KEY is configured
+      if (context.env.RESEND_API_KEY && uniqueEmails.length > 0) {
+        for (const recipient of uniqueEmails) {
+          await sendRealEmail({
+            to: recipient,
+            subject: campaign.subject,
+            html: campaignHtml,
+            apiKey: context.env.RESEND_API_KEY,
+          });
+          sentCount++;
+        }
+      }
+
+      // Log broadcast in email_logs
       const logId = `camp-log-${Date.now()}`;
       await context.env.DB.prepare(
         'INSERT INTO email_logs (id, recipient_email, recipient_name, template_type, subject, sent_by) VALUES (?, ?, ?, ?, ?, ?)'
       )
         .bind(
           logId,
-          'all_recipients@aisa.uitm.edu.my',
-          `Semua Peserta (${campaign.recipientCount || 'Broadcast'})`,
-          campaign.templateStyle || 'modern_card',
+          `broadcast_${target}@aisa.uitm.edu.my`,
+          `Penerima (${uniqueEmails.length || campaign.recipientCount || 0} sasaran)`,
+          campaign.templateStyle || 'tech_summit',
           campaign.subject,
-          campaign.senderRole || 'Exco AISA'
+          context.env.RESEND_API_KEY ? `Resend API (${sentCount} Dihantar)` : 'Simulasi Exco D1'
         )
         .run();
     }

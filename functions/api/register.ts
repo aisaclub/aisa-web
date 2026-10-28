@@ -1,8 +1,10 @@
 // Cloudflare Pages Function: /api/register
 // Full Cloudflare D1 SQLite Database Integration for Club Registrations
+import { sendRealEmail, renderWelcomeEmailHtml } from './_mailer';
 
 interface Env {
   DB?: any;
+  RESEND_API_KEY?: string;
 }
 
 export async function onRequestPost(context: { request: Request; env: Env }) {
@@ -21,8 +23,25 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
     const membershipId = `AISA-2026-${membershipNumber}`;
     const registeredAt = new Date().toISOString().replace('T', ' ').substring(0, 16);
 
+    // 1. Send / Log Real Email using Resend
+    const welcomeHtml = renderWelcomeEmailHtml({
+      fullName: data.fullName,
+      membershipId,
+      studentId: data.studentId,
+      program: data.program || '',
+      semester: data.semester || '',
+      aiInterest: data.aiInterest || '',
+    });
+
+    const mailResult = await sendRealEmail({
+      to: data.email,
+      subject: `[AISA UiTM Jasin] Kad Keahlian Digital & Pengesahan Ahli (${membershipId})`,
+      html: welcomeHtml,
+      apiKey: context.env.RESEND_API_KEY,
+    });
+
     if (context.env.DB) {
-      // 1. Insert into club_registrations table
+      // 2. Insert into club_registrations table
       await context.env.DB.prepare(
         `INSERT INTO club_registrations (
           id, full_name, student_id, email, phone_number, program, semester, ai_interest, membership_id, status, assigned_pic, registered_at
@@ -44,7 +63,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
         )
         .run();
 
-      // 2. Log confirmation email into email_logs
+      // 3. Log confirmation email into email_logs table
       const logId = `log-${Date.now()}`;
       await context.env.DB.prepare(
         'INSERT INTO email_logs (id, recipient_email, recipient_name, template_type, subject, sent_by) VALUES (?, ?, ?, ?, ?, ?)'
@@ -55,7 +74,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
           data.fullName,
           'welcome',
           `[AISA UiTM Jasin] Kad Keahlian Digital & Pengesahan Ahli (${membershipId})`,
-          'Sistem Pendaftaran D1'
+          mailResult.sent ? 'Resend API (Delivered)' : 'Sistem Pendaftaran D1'
         )
         .run();
     }

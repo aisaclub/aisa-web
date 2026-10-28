@@ -1,8 +1,10 @@
 // Cloudflare Pages Function: /api/subscribe
 // Full Cloudflare D1 SQLite Database Integration
+import { sendRealEmail, renderSubscriberEmailHtml } from './_mailer';
 
 interface Env {
   DB?: any;
+  RESEND_API_KEY?: string;
 }
 
 export async function onRequestPost(context: { request: Request; env: Env }) {
@@ -20,16 +22,27 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
     const preferredTopic = data.preferredTopic || 'Semua Hebahan & Mesyuarat';
     const subscribedAt = new Date().toISOString().split('T')[0];
 
-    // If Cloudflare D1 is available at the Edge
+    // 1. Send / Log Real Email using Resend
+    const subHtml = renderSubscriberEmailHtml({
+      email: data.email,
+      topic: preferredTopic,
+    });
+
+    const mailResult = await sendRealEmail({
+      to: data.email,
+      subject: '[AISA UiTM Jasin] Pengesahan Langganan Buletin & Notis Rasmi',
+      html: subHtml,
+      apiKey: context.env.RESEND_API_KEY,
+    });
+
+    // 2. If Cloudflare D1 is available at the Edge
     if (context.env.DB) {
-      // 1. Insert into notice_subscribers
       await context.env.DB.prepare(
         'INSERT OR REPLACE INTO notice_subscribers (id, email, preferred_topic, subscribed_at) VALUES (?, ?, ?, ?)'
       )
         .bind(subscriberId, data.email, preferredTopic, subscribedAt)
         .run();
 
-      // 2. Log confirmation notification in email_logs
       const logId = `log-${Date.now()}`;
       await context.env.DB.prepare(
         'INSERT INTO email_logs (id, recipient_email, recipient_name, template_type, subject, sent_by) VALUES (?, ?, ?, ?, ?, ?)'
@@ -40,7 +53,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
           'Pelanggan Notis',
           'subscribe_confirm',
           '[AISA UiTM Jasin] Pengesahan Langganan Buletin & Notis Rasmi',
-          'Sistem Langganan D1'
+          mailResult.sent ? 'Resend API (Delivered)' : 'Sistem Langganan D1'
         )
         .run();
     }
