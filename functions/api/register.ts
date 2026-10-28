@@ -24,7 +24,8 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
     const membershipId = `AISA-2026-${membershipNumber}`;
     const registeredAt = new Date().toISOString().replace('T', ' ').substring(0, 16);
 
-    // 1. Send / Log Real Email using Resend
+    // 1. Send / Log Real Email using Gmail Relay / Resend (Choice of 6 Design Styles)
+    const preferredStyle = (data.style as any) || 'minimalist';
     const welcomeHtml = renderWelcomeEmailHtml({
       fullName: data.fullName,
       membershipId,
@@ -32,7 +33,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       program: data.program || '',
       semester: data.semester || '',
       aiInterest: data.aiInterest || '',
-    });
+    }, preferredStyle);
 
     const mailResult = await sendRealEmail({
       to: data.email,

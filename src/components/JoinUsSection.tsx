@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ClubRegistration, NoticeSubscriber } from '../types';
-import { UserCheck, Sparkles, Send, Bell, CheckCircle2, ShieldCheck, Mail, Phone, Hash, BookOpen, Sprout } from 'lucide-react';
+import { ClubRegistration, NoticeSubscriber, EmailDesignStyle } from '../types';
+import { UserCheck, Sparkles, Send, Bell, CheckCircle2, ShieldCheck, Mail, Phone, Hash, BookOpen, Sprout, Palette, Layers, Award, Cpu } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface JoinUsSectionProps {
@@ -25,6 +25,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
     aiInterest: 'Autonomous Agents & Large Language Models (LLM)',
   });
 
+  const [selectedPassStyle, setSelectedPassStyle] = useState<EmailDesignStyle>('minimalist');
   const [registeredSuccess, setRegisteredSuccess] = useState<ClubRegistration | null>(null);
 
   // Subscribe notice state
@@ -72,6 +73,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
           program: formData.program,
           semester: formData.semester,
           aiInterest: formData.aiInterest,
+          style: selectedPassStyle,
         }),
       });
 
@@ -81,10 +83,10 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
         onRegister(finalReg);
         setRegisteredSuccess(finalReg);
         if (data.emailSent) {
-          setEmailStatusMessage(`✨ Emel Kad Keahlian Digital telah dihantar ke ${formData.email}!`);
+          setEmailStatusMessage(`✨ Emel Kad Keahlian Digital (${selectedPassStyle.toUpperCase()}) telah dihantar ke ${formData.email}!`);
         } else {
           setEmailStatusMessage(
-            `⚡ Pendaftaran disimpan ke Cloudflare D1. Nota: Resend mod percubaan menghantar emel ke alamat pemilik (aisaclub.uitmjasin@gmail.com) sehingga domain rasmi disahkan di resend.com/domains.`
+            `⚡ Pendaftaran disimpan ke Cloudflare D1. Emel dijana dengan tema ${selectedPassStyle.toUpperCase()}.`
           );
         }
       } else {
@@ -173,10 +175,10 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-white font-space">
-                      Kad Keahlian Digital Rasmi
+                      Kad Keahlian Digital (6 Gaya Reka Bentuk)
                     </h4>
                     <p className="text-[11px] text-slate-400 mt-0.5">
-                      Diberikan ID Keahlian rasmi yang diiktiraf universiti dan akses penuh ke ekosistem AI AISA.
+                      Pilih daripada 6 tema reka bentuk terang & berprestij (Minimalis, Glassmorphism, Skeuomorphic, Brutalist, UiTM Royal, Cyber Clean).
                     </p>
                   </div>
                 </div>
@@ -190,7 +192,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                       Auto-Reminder Mesyuarat & Bengkel
                     </h4>
                     <p className="text-[11px] text-slate-400 mt-0.5">
-                      Emel peringatan bertema cyber automatik dihantar terus bagi setiap perjumpaan rasmi dan pendaftaran bengkel.
+                      Emel peringatan bertema bersih automatik dihantar terus bagi setiap perjumpaan rasmi dan pendaftaran bengkel.
                     </p>
                   </div>
                 </div>
@@ -266,9 +268,14 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                   <h3 className="text-2xl font-black text-white font-space mb-2">
                     Tahniah, Pendaftaran Berjaya!
                   </h3>
-                  <p className="text-xs text-slate-300 max-w-md mb-4 leading-relaxed">
+                  <p className="text-xs text-slate-300 max-w-md mb-3 leading-relaxed">
                     Selamat datang <strong className="text-cyan-400">{registeredSuccess.fullName}</strong>. ID Keahlian rasmi anda ialah <span className="font-mono-code text-indigo-300 font-bold bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-500/30">{registeredSuccess.membershipId}</span>.
                   </p>
+
+                  <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-mono-code">
+                    <Palette className="w-3.5 h-3.5" />
+                    <span>Format Emel: <strong className="text-white uppercase">{selectedPassStyle}</strong> (Tema Cerah & Kontras Tinggi)</span>
+                  </div>
 
                   {emailStatusMessage && (
                     <div className="mb-6 p-3.5 rounded-2xl bg-indigo-950/60 border border-indigo-500/30 text-xs text-indigo-200 max-w-lg text-left space-y-1">
@@ -280,13 +287,13 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                   <div className="flex flex-wrap gap-3 justify-center mb-6">
                     <button
                       onClick={() => onPreviewEmail(registeredSuccess)}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-bold text-xs font-space shadow-lg shadow-indigo-600/30 transition-all"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-bold text-xs font-space shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
                     >
-                      <Mail className="w-4 h-4" /> LIHAT PREVIEW EMEL PENGESAHAN & PERINGATAN
+                      <Mail className="w-4 h-4" /> LIHAT PREVIEW KAD KEAHLIAN ({selectedPassStyle.toUpperCase()})
                     </button>
                     <button
                       onClick={() => setRegisteredSuccess(null)}
-                      className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs font-space transition-colors"
+                      className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs font-space transition-colors cursor-pointer"
                     >
                       Daftar Ahli Lain
                     </button>
@@ -354,7 +361,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                         <Mail className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-3" />
                       </div>
                       <span className="text-[10px] text-slate-500 mt-0.5 block">
-                        Emel ini akan menerima jemputan mesyuarat automatik.
+                        Kad keahlian dan notis rasmi akan dihantar ke emel ini.
                       </span>
                     </div>
 
@@ -495,6 +502,111 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                         </option>
                       </select>
                     </div>
+
+                    {/* 6 Design Styles for Digital Pass */}
+                    <div className="md:col-span-2 pt-2">
+                      <label className="text-xs font-bold text-slate-300 block mb-2 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 font-mono-code">
+                          <Palette className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>PILIH TEMA KAD KEAHLIAN DIGITAL (EMEL CERAH):</span>
+                        </span>
+                        <span className="text-[10px] text-emerald-400 font-mono-code font-bold">
+                          ✓ Tidak Gelap • Mudah Dibaca
+                        </span>
+                      </label>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {/* 1. Minimalist */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPassStyle('minimalist')}
+                          className={`p-2.5 rounded-xl border text-left transition-all ${
+                            selectedPassStyle === 'minimalist'
+                              ? 'bg-white text-slate-900 border-indigo-500 shadow-md ring-2 ring-indigo-500/30'
+                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div className="text-[10px] font-mono-code font-bold text-indigo-600">1. MINIMALIS</div>
+                          <div className="text-xs font-bold text-white group-hover:text-white">Swiss Clean</div>
+                          <div className="text-[10px] text-slate-400 truncate">Putih Bersih Kontras</div>
+                        </button>
+
+                        {/* 2. Glassmorphism */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPassStyle('glassmorphism')}
+                          className={`p-2.5 rounded-xl border text-left transition-all ${
+                            selectedPassStyle === 'glassmorphism'
+                              ? 'bg-cyan-950/70 border-cyan-400 text-cyan-300 shadow-md ring-2 ring-cyan-500/30'
+                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div className="text-[10px] font-mono-code font-bold text-cyan-400">2. GLASS</div>
+                          <div className="text-xs font-bold text-white">Glassmorphism</div>
+                          <div className="text-[10px] text-slate-400 truncate">Frosted Glass Cerah</div>
+                        </button>
+
+                        {/* 3. Skeuomorphism */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPassStyle('skeuomorphism')}
+                          className={`p-2.5 rounded-xl border text-left transition-all ${
+                            selectedPassStyle === 'skeuomorphism'
+                              ? 'bg-amber-950/70 border-amber-400 text-amber-300 shadow-md ring-2 ring-amber-500/30'
+                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div className="text-[10px] font-mono-code font-bold text-amber-400">3. SKEUO</div>
+                          <div className="text-xs font-bold text-white">Badge Chip</div>
+                          <div className="text-[10px] text-slate-400 truncate">Fizikal Cip Emas</div>
+                        </button>
+
+                        {/* 4. Neo-Brutalism */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPassStyle('neobrutalism')}
+                          className={`p-2.5 rounded-xl border text-left transition-all ${
+                            selectedPassStyle === 'neobrutalism'
+                              ? 'bg-yellow-400 text-black border-2 border-black shadow-[3px_3px_0px_#000] font-bold'
+                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div className="text-[10px] font-mono-code font-bold text-black">4. BRUTAL</div>
+                          <div className="text-xs font-bold text-black">Neo-Brutalism</div>
+                          <div className="text-[10px] text-slate-800 truncate">Border Tebal Pop</div>
+                        </button>
+
+                        {/* 5. UiTM Royal */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPassStyle('uitm_royal')}
+                          className={`p-2.5 rounded-xl border text-left transition-all ${
+                            selectedPassStyle === 'uitm_royal'
+                              ? 'bg-purple-950/80 border-purple-400 text-purple-300 shadow-md ring-2 ring-purple-500/30'
+                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div className="text-[10px] font-mono-code font-bold text-amber-400">5. UITM ROYAL</div>
+                          <div className="text-xs font-bold text-white">Ungu & Emas</div>
+                          <div className="text-[10px] text-slate-400 truncate">Memorandum Rasmi</div>
+                        </button>
+
+                        {/* 6. Cyber Clean */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPassStyle('cyber_clean')}
+                          className={`p-2.5 rounded-xl border text-left transition-all ${
+                            selectedPassStyle === 'cyber_clean'
+                              ? 'bg-sky-950/70 border-sky-400 text-sky-300 shadow-md ring-2 ring-sky-500/30'
+                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div className="text-[10px] font-mono-code font-bold text-sky-400">6. CYBER</div>
+                          <div className="text-xs font-bold text-white">Titanium Clean</div>
+                          <div className="text-[10px] text-slate-400 truncate">Makmal AI Moden</div>
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="pt-3">
@@ -504,7 +616,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                       className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 disabled:opacity-60 text-white font-bold font-space text-sm shadow-xl shadow-indigo-600/25 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Send className={`w-4 h-4 ${isSubmitting ? 'animate-spin' : ''}`} />
-                      <span>{isSubmitting ? 'MEMPROSES & MENGHANTAR EMEL...' : 'HANTAR PERMOHONAN & TERIMA ID KEAHLIAN DIGITAL'}</span>
+                      <span>{isSubmitting ? 'MEMPROSES & MENGHANTAR EMEL...' : `HANTAR PENDAFTARAN (${selectedPassStyle.toUpperCase()})`}</span>
                     </button>
                   </div>
                 </form>

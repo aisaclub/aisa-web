@@ -76,11 +76,19 @@ export interface NoticeSubscriber {
   preferredTopic: string;
 }
 
+export type EmailDesignStyle =
+  | 'minimalist'      // Clean Light Minimalist Academic
+  | 'glassmorphism'   // Frosted Glass Cyber Glow
+  | 'skeuomorphism'   // Tactile Physical ID Badge with metallic chip
+  | 'neobrutalism'    // High-Contrast Bold Border Neo-Brutalist
+  | 'uitm_royal'      // UiTM Royal Purple & Corporate Gold Official Memo
+  | 'cyber_clean';    // Clean Titanium Silver & Electric Cyan
+
 export interface CustomEmailCampaign {
   id: string;
   title: string;
   subject: string;
-  templateStyle: 'uitm_official' | 'modern_card' | 'minimal_alert';
+  templateStyle: EmailDesignStyle;
   senderRole: string; // cth: 'Setiausaha Kehormat AISA', 'Exco Akademik'
   eventDate?: string;
   eventTime?: string;

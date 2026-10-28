@@ -26,7 +26,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       date: campaign.eventDate,
       time: campaign.eventTime,
       location: campaign.eventLocation,
-      templateStyle: campaign.templateStyle || 'tech_summit',
+      templateStyle: campaign.templateStyle || 'minimalist',
       senderRole: campaign.senderRole || 'Exco AISA',
       senderName: campaign.senderName || 'Barisan Majlis Tertinggi AISA',
     });
