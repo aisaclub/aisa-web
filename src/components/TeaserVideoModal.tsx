@@ -70,7 +70,7 @@ export const TeaserVideoModal: React.FC<TeaserVideoModalProps> = ({ isOpen, onCl
       return;
     }
 
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isPlaying) {
       interval = setInterval(() => {
         setCurrentTime((prev) => {
