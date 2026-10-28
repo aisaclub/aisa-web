@@ -13,39 +13,249 @@ import { AdminPortalModal } from './components/AdminPortalModal';
 import { EmailTemplateModal } from './components/EmailTemplateModal';
 import { ExcoEmailStudioModal } from './components/ExcoEmailStudioModal';
 import { Footer } from './components/Footer';
-import { Gamepad2, PlayCircle, ShieldCheck } from 'lucide-react';
+import { Gamepad2, PlayCircle, ShieldCheck, Database, RefreshCw } from 'lucide-react';
+
+const isLocal = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname.includes('192.168.')
+);
+
+// DB Row Normalizers
+function mapMember(m: any): CommitteeMember {
+  return {
+    id: m.id,
+    name: m.name,
+    role: m.role,
+    level: m.level || 'exco',
+    department: m.department || 'Biro AI & Sains Data',
+    photoUrl: m.photo_url || m.photoUrl || '',
+    bio: m.bio || '',
+    aiSpecialty: m.ai_specialty || m.aiSpecialty || '',
+    linkedin: m.linkedin_url || m.linkedin || '',
+    github: m.github_url || m.github || '',
+    email: m.email || '',
+    yearProgram: m.year_program || m.yearProgram || '',
+  };
+}
+
+function mapAdvisor(a: any): LecturerAdvisor {
+  return {
+    id: a.id,
+    name: a.name,
+    title: a.title,
+    faculty: a.faculty || 'KPPIM UiTM Jasin',
+    room: a.room || '',
+    email: a.email || '',
+    photoUrl: a.photo_url || a.photoUrl || '',
+    researchArea: a.research_area || a.researchArea || '',
+    consultationHours: a.consultation_hours || a.consultationHours || '',
+    googleScholar: a.google_scholar || a.googleScholar || '',
+  };
+}
+
+function mapAnnouncement(ann: any): Announcement {
+  return {
+    id: ann.id,
+    title: ann.title,
+    category: ann.category || 'Hebahan',
+    description: ann.description,
+    date: ann.date,
+    deadline: ann.deadline || undefined,
+    bannerUrl: ann.banner_url || ann.bannerUrl || '',
+    bannerUrl2: ann.banner_url2 || ann.bannerUrl2 || undefined,
+    location: ann.location || undefined,
+    eventTime: ann.event_time || ann.eventTime || undefined,
+    registrationLink: ann.registration_link || ann.registrationLink || '#join-us',
+    isUrgent: Boolean(ann.is_urgent ?? ann.isUrgent),
+    status: ann.status || 'Open',
+  };
+}
+
+function mapActivity(act: any): Activity {
+  let galleryArray: string[] = [];
+  if (Array.isArray(act.gallery)) {
+    galleryArray = act.gallery;
+  } else if (typeof act.gallery === 'string') {
+    try {
+      galleryArray = JSON.parse(act.gallery);
+    } catch {
+      galleryArray = [];
+    }
+  }
+  return {
+    id: act.id,
+    title: act.title,
+    date: act.event_date || act.date || '',
+    category: act.category || 'Workshop',
+    summary: act.summary || '',
+    coverImage: act.cover_image || act.coverImage || '',
+    gallery: galleryArray,
+    attendeesCount: Number(act.attendees_count || act.attendeesCount || 0),
+    highlightText: act.highlight_text || act.highlightText || '',
+    aiField: act.ai_field || act.aiField || undefined,
+    location: act.location || undefined,
+  };
+}
+
+function mapRegistration(reg: any): ClubRegistration {
+  return {
+    id: reg.id,
+    fullName: reg.full_name || reg.fullName || '',
+    studentId: reg.student_id || reg.studentId || '',
+    email: reg.email || '',
+    phoneNumber: reg.whatsapp_number || reg.phone_number || reg.phoneNumber || '',
+    program: reg.program || '',
+    semester: reg.semester || '',
+    aiInterest: reg.ai_interest || reg.aiInterest || '',
+    membershipId: reg.membership_id || reg.membershipId || '',
+    status: reg.status || 'Baru',
+    assignedPic: reg.assigned_pic || reg.assignedPic || 'Belum Ditetapkan',
+    registeredAt: reg.registered_at || reg.registeredAt || '',
+    excoNotes: reg.exco_notes || reg.excoNotes || '',
+  };
+}
+
+function mapSubscriber(sub: any): NoticeSubscriber {
+  return {
+    id: sub.id,
+    email: sub.email,
+    subscribedAt: sub.subscribed_at || sub.subscribedAt || '',
+    preferredTopic: sub.preferred_topic || sub.preferredTopic || 'Semua Hebahan & Mesyuarat',
+  };
+}
 
 export function App() {
-  // 1. Data State with LocalStorage Persistence
+  // 1. Data State: In production, 100% sourced from Cloudflare D1. In local dev, can fallback to initial data if offline.
   const [members, setMembers] = useState<CommitteeMember[]>(() => {
-    const saved = localStorage.getItem('aisa_members');
-    return saved ? JSON.parse(saved) : initialMembers;
+    if (isLocal) {
+      const saved = localStorage.getItem('aisa_members');
+      return saved ? JSON.parse(saved) : initialMembers;
+    }
+    return [];
   });
 
   const [advisors, setAdvisors] = useState<LecturerAdvisor[]>(() => {
-    const saved = localStorage.getItem('aisa_advisors');
-    return saved ? JSON.parse(saved) : initialAdvisors;
+    if (isLocal) {
+      const saved = localStorage.getItem('aisa_advisors');
+      return saved ? JSON.parse(saved) : initialAdvisors;
+    }
+    return [];
   });
 
   const [announcements, setAnnouncements] = useState<Announcement[]>(() => {
-    const saved = localStorage.getItem('aisa_announcements');
-    return saved ? JSON.parse(saved) : initialAnnouncements;
+    if (isLocal) {
+      const saved = localStorage.getItem('aisa_announcements');
+      return saved ? JSON.parse(saved) : initialAnnouncements;
+    }
+    return [];
   });
 
   const [activities, setActivities] = useState<Activity[]>(() => {
-    const saved = localStorage.getItem('aisa_activities');
-    return saved ? JSON.parse(saved) : initialActivities;
+    if (isLocal) {
+      const saved = localStorage.getItem('aisa_activities');
+      return saved ? JSON.parse(saved) : initialActivities;
+    }
+    return [];
   });
 
   const [registrations, setRegistrations] = useState<ClubRegistration[]>(() => {
-    const saved = localStorage.getItem('aisa_registrations');
-    return saved ? JSON.parse(saved) : initialRegistrations;
+    if (isLocal) {
+      const saved = localStorage.getItem('aisa_registrations');
+      return saved ? JSON.parse(saved) : initialRegistrations;
+    }
+    return [];
   });
 
   const [subscribers, setSubscribers] = useState<NoticeSubscriber[]>(() => {
-    const saved = localStorage.getItem('aisa_subscribers');
-    return saved ? JSON.parse(saved) : initialSubscribers;
+    if (isLocal) {
+      const saved = localStorage.getItem('aisa_subscribers');
+      return saved ? JSON.parse(saved) : initialSubscribers;
+    }
+    return [];
   });
+
+  const [isD1Connected, setIsD1Connected] = useState<boolean>(false);
+  const [isLoadingDb, setIsLoadingDb] = useState<boolean>(!isLocal);
+
+  // Function to fetch live data from Cloudflare D1
+  const fetchD1Data = async () => {
+    setIsLoadingDb(true);
+    try {
+      const [resMembers, resAdvisors, resAnnouncements, resActivities, resRegistrations, resSubscribers] = await Promise.all([
+        fetch('/api/members').then((r) => r.ok ? r.json() : []).catch(() => []),
+        fetch('/api/advisors').then((r) => r.ok ? r.json() : []).catch(() => []),
+        fetch('/api/announcements').then((r) => r.ok ? r.json() : []).catch(() => []),
+        fetch('/api/activities').then((r) => r.ok ? r.json() : []).catch(() => []),
+        fetch('/api/register').then((r) => r.ok ? r.json() : []).catch(() => []),
+        fetch('/api/subscribe').then((r) => r.ok ? r.json() : []).catch(() => []),
+      ]);
+
+      let hasD1Data = false;
+
+      if (Array.isArray(resMembers) && resMembers.length > 0) {
+        setMembers(resMembers.map(mapMember));
+        hasD1Data = true;
+      } else if (isLocal && members.length === 0) {
+        setMembers(initialMembers);
+      }
+
+      if (Array.isArray(resAdvisors) && resAdvisors.length > 0) {
+        setAdvisors(resAdvisors.map(mapAdvisor));
+        hasD1Data = true;
+      } else if (isLocal && advisors.length === 0) {
+        setAdvisors(initialAdvisors);
+      }
+
+      if (Array.isArray(resAnnouncements) && resAnnouncements.length > 0) {
+        setAnnouncements(resAnnouncements.map(mapAnnouncement));
+        hasD1Data = true;
+      } else if (isLocal && announcements.length === 0) {
+        setAnnouncements(initialAnnouncements);
+      }
+
+      if (Array.isArray(resActivities) && resActivities.length > 0) {
+        setActivities(resActivities.map(mapActivity));
+        hasD1Data = true;
+      } else if (isLocal && activities.length === 0) {
+        setActivities(initialActivities);
+      }
+
+      if (Array.isArray(resRegistrations)) {
+        setRegistrations(resRegistrations.map(mapRegistration));
+        if (resRegistrations.length > 0) hasD1Data = true;
+      } else if (isLocal && registrations.length === 0) {
+        setRegistrations(initialRegistrations);
+      }
+
+      if (Array.isArray(resSubscribers)) {
+        setSubscribers(resSubscribers.map(mapSubscriber));
+        if (resSubscribers.length > 0) hasD1Data = true;
+      } else if (isLocal && subscribers.length === 0) {
+        setSubscribers(initialSubscribers);
+      }
+
+      setIsD1Connected(hasD1Data || !isLocal);
+    } catch (err) {
+      console.error('Gagal berhubung dengan pangkalan data Cloudflare D1:', err);
+      if (isLocal) {
+        // Fallback to local data only on localhost
+        setMembers(initialMembers);
+        setAdvisors(initialAdvisors);
+        setAnnouncements(initialAnnouncements);
+        setActivities(initialActivities);
+        setRegistrations(initialRegistrations);
+        setSubscribers(initialSubscribers);
+      }
+    } finally {
+      setIsLoadingDb(false);
+    }
+  };
+
+  // Mount Effect: Always fetch live Cloudflare D1 data
+  useEffect(() => {
+    fetchD1Data();
+  }, []);
 
   // Theme Mode State (3 Modes: cyber_dark, soft_light, uitm_royal)
   const [themeMode, setThemeMode] = useState<WebThemeMode>(() => {
@@ -91,30 +301,17 @@ export function App() {
     templateType: 'welcome',
   });
 
-  // Sync to LocalStorage
+  // Local storage caching only on localhost
   useEffect(() => {
-    localStorage.setItem('aisa_members', JSON.stringify(members));
-  }, [members]);
-
-  useEffect(() => {
-    localStorage.setItem('aisa_advisors', JSON.stringify(advisors));
-  }, [advisors]);
-
-  useEffect(() => {
-    localStorage.setItem('aisa_announcements', JSON.stringify(announcements));
-  }, [announcements]);
-
-  useEffect(() => {
-    localStorage.setItem('aisa_activities', JSON.stringify(activities));
-  }, [activities]);
-
-  useEffect(() => {
-    localStorage.setItem('aisa_registrations', JSON.stringify(registrations));
-  }, [registrations]);
-
-  useEffect(() => {
-    localStorage.setItem('aisa_subscribers', JSON.stringify(subscribers));
-  }, [subscribers]);
+    if (isLocal) {
+      localStorage.setItem('aisa_members', JSON.stringify(members));
+      localStorage.setItem('aisa_advisors', JSON.stringify(advisors));
+      localStorage.setItem('aisa_announcements', JSON.stringify(announcements));
+      localStorage.setItem('aisa_activities', JSON.stringify(activities));
+      localStorage.setItem('aisa_registrations', JSON.stringify(registrations));
+      localStorage.setItem('aisa_subscribers', JSON.stringify(subscribers));
+    }
+  }, [members, advisors, announcements, activities, registrations, subscribers]);
 
   useEffect(() => {
     localStorage.setItem('aisa_is_admin', isAdmin.toString());
@@ -135,22 +332,55 @@ export function App() {
     }
   };
 
-  const handleUpdateMember = (updated: CommitteeMember) => {
+  // Direct Cloudflare D1 Mutations
+  const handleUpdateMember = async (updated: CommitteeMember) => {
     setMembers((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
-  };
-
-  const handleAddAnnouncement = (newAnn: Announcement) => {
-    setAnnouncements((prev) => [newAnn, ...prev]);
-  };
-
-  const handleDeleteAnnouncement = (id: string) => {
-    if (confirm('Adakah anda pasti mahu memadamkan hebahan ini?')) {
-      setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+    try {
+      await fetch('/api/members', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+    } catch (err) {
+      console.error('Gagal mengemas kini ahli ke Cloudflare D1:', err);
     }
   };
 
-  const handleAddActivity = (newAct: Activity) => {
+  const handleAddAnnouncement = async (newAnn: Announcement) => {
+    setAnnouncements((prev) => [newAnn, ...prev]);
+    try {
+      await fetch('/api/announcements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newAnn),
+      });
+    } catch (err) {
+      console.error('Gagal menambah hebahan ke Cloudflare D1:', err);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (confirm('Adakah anda pasti mahu memadamkan hebahan ini daripada pangkalan data?')) {
+      setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+      try {
+        await fetch(`/api/announcements?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+      } catch (err) {
+        console.error('Gagal memadam hebahan daripada Cloudflare D1:', err);
+      }
+    }
+  };
+
+  const handleAddActivity = async (newAct: Activity) => {
     setActivities((prev) => [newAct, ...prev]);
+    try {
+      await fetch('/api/activities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newAct),
+      });
+    } catch (err) {
+      console.error('Gagal menambah aktiviti ke Cloudflare D1:', err);
+    }
   };
 
   const handleRegisterMember = (newReg: ClubRegistration) => {
@@ -161,34 +391,48 @@ export function App() {
     setSubscribers((prev) => [newSub, ...prev]);
   };
 
-  const handleUpdateRegStatus = (id: string, status: ClubRegistration['status'], assignedPic?: string) => {
+  const handleUpdateRegStatus = async (id: string, status: ClubRegistration['status'], assignedPic?: string) => {
     setRegistrations((prev) =>
       prev.map((r) => (r.id === id ? { ...r, status, assignedPic: assignedPic || r.assignedPic } : r))
     );
+    try {
+      await fetch('/api/register', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status, assignedPic }),
+      });
+    } catch (err) {
+      console.error('Gagal mengemas kini status ke Cloudflare D1:', err);
+    }
   };
 
   const handleDeleteRegistration = async (id: string) => {
     setRegistrations((prev) => prev.filter((r) => r.id !== id));
     try {
-      await fetch(`/api/register?id=${id}`, { method: 'DELETE' });
-    } catch {
-      // Handled silently
+      await fetch(`/api/register?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+    } catch (err) {
+      console.error('Gagal memadam pendaftaran daripada Cloudflare D1:', err);
     }
   };
 
   const handleResetData = () => {
-    setMembers(initialMembers);
-    setAdvisors(initialAdvisors);
-    setAnnouncements(initialAnnouncements);
-    setActivities(initialActivities);
-    setRegistrations(initialRegistrations);
-    setSubscribers(initialSubscribers);
-    localStorage.removeItem('aisa_members');
-    localStorage.removeItem('aisa_advisors');
-    localStorage.removeItem('aisa_announcements');
-    localStorage.removeItem('aisa_activities');
-    localStorage.removeItem('aisa_registrations');
-    localStorage.removeItem('aisa_subscribers');
+    if (isLocal) {
+      setMembers(initialMembers);
+      setAdvisors(initialAdvisors);
+      setAnnouncements(initialAnnouncements);
+      setActivities(initialActivities);
+      setRegistrations(initialRegistrations);
+      setSubscribers(initialSubscribers);
+      localStorage.removeItem('aisa_members');
+      localStorage.removeItem('aisa_advisors');
+      localStorage.removeItem('aisa_announcements');
+      localStorage.removeItem('aisa_activities');
+      localStorage.removeItem('aisa_registrations');
+      localStorage.removeItem('aisa_subscribers');
+    } else {
+      // In production, refresh straight from Cloudflare D1
+      fetchD1Data();
+    }
   };
 
   const handleOpenEditMember = (member: CommitteeMember) => {
@@ -214,7 +458,11 @@ export function App() {
         <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 text-slate-950 font-bold font-mono-code text-[11px] py-1 px-4 text-center flex items-center justify-center gap-2 shadow-lg">
           <ShieldCheck className="w-4 h-4" />
           <span>
-            [MOD ADMIN & EXCO DIAKTIFKAN] Anda boleh klik mana-mana kad Exco untuk kemas kini info terus!
+            [MOD ADMIN & EXCO DIAKTIFKAN] Klik mana-mana kad Exco untuk kemas kini info terus!
+          </span>
+          <span className="hidden sm:inline-flex items-center gap-1 bg-black/30 text-white px-2 py-0.5 rounded-full text-[10px]">
+            <Database className="w-3 h-3 text-emerald-300" />
+            {isD1Connected ? 'Cloudflare D1 SQL (aisaclub) Live' : 'Menyambung D1...'}
           </span>
           <button
             onClick={() => setIsAdminPortalOpen(true)}

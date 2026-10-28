@@ -49,22 +49,30 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       // 2. Insert into club_registrations table
       await db.prepare(
         `INSERT INTO club_registrations (
-          id, full_name, student_id, email, phone_number, program, semester, ai_interest, membership_id, status, assigned_pic, registered_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          id, full_name, student_id, email, whatsapp_number, program, semester, ai_interest,
+          membership_id, status, assigned_pic, registered_at, faculty, campus, t_shirt_size,
+          github_url, linkedin_url, dietary_preference
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
         .bind(
           regId,
           data.fullName,
           data.studentId,
           data.email,
-          data.phoneNumber || '',
+          data.whatsappNumber || data.phoneNumber || '',
           data.program || '',
           data.semester || '',
           data.aiInterest || '',
           membershipId,
           'Baru',
           data.assignedPic || 'Belum Ditetapkan',
-          registeredAt
+          registeredAt,
+          data.faculty || 'FSKM',
+          data.campus || 'UiTM Melaka Kampus Jasin',
+          data.tShirtSize || 'L',
+          data.githubUrl || null,
+          data.linkedinUrl || null,
+          data.dietaryPreference || 'Biasa'
         )
         .run();
 
@@ -157,12 +165,13 @@ export async function onRequestPatch(context: { request: Request; env: Env }) {
     if (!id || !status) {
       return new Response(JSON.stringify({ error: 'ID dan status diperlukan' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       });
     }
 
-    if (context.env.DB) {
-      await context.env.DB.prepare(
+    const db = context.env.DB || (context.env as any)['context.env.DB'];
+    if (db) {
+      await db.prepare(
         'UPDATE club_registrations SET status = ?, assigned_pic = ? WHERE id = ?'
       )
         .bind(status, assignedPic || 'Belum Ditetapkan', id)
@@ -170,12 +179,12 @@ export async function onRequestPatch(context: { request: Request; env: Env }) {
     }
 
     return new Response(JSON.stringify({ success: true, id, status, assignedPic }), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 }
@@ -188,7 +197,7 @@ export async function onRequestDelete(context: { request: Request; env: Env }) {
     if (!id) {
       return new Response(JSON.stringify({ error: 'ID pendaftaran diperlukan' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       });
     }
 
@@ -204,7 +213,17 @@ export async function onRequestDelete(context: { request: Request; env: Env }) {
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
+}
+
+export async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
 }

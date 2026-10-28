@@ -101,17 +101,46 @@ export async function onRequestGet(context: { env: any }) {
         'SELECT * FROM notice_subscribers ORDER BY subscribed_at DESC'
       ).all();
       return new Response(JSON.stringify(results), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       });
     }
 
     return new Response(JSON.stringify([]), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
+}
+
+export async function onRequestDelete(context: { request: Request; env: any }) {
+  try {
+    const url = new URL(context.request.url);
+    const id = url.searchParams.get('id');
+    const db = context.env.DB || context.env['context.env.DB'];
+    if (db && id) {
+      await db.prepare('DELETE FROM notice_subscribers WHERE id = ?').bind(id).run();
+    }
+    return new Response(JSON.stringify({ success: true, message: `Langganan ${id} telah dipadam.` }), {
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  } catch (error: any) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  }
+}
+
+export async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
 }
