@@ -4,11 +4,14 @@ pages_build_output_dir = "dist"
 
 # ==============================================================================
 # Cloudflare D1 Database Binding
-# Untuk run: npx wrangler d1 create aisa-db
-# Masukkan database_id yang dijana di bawah ini
+# Untuk Cloudflare Pages:
+# Paling mudah & stabil adalah link terus di Cloudflare Dashboard:
+# Dashboard > Workers & Pages > aisa-web > Settings > Functions > D1 database bindings
+# Variable name: DB -> Pilih database: aisa-db
+#
+# (Nota: Jangan biarkan placeholder UUID dummy aktif kerana Wrangler deploy akan gagal)
 # ==============================================================================
-[[d1_databases]]
-binding = "DB"
-database_name = "aisa-db"
-database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-migrations_dir = "migrations"
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "aisa-db"
+# database_id = "MASUKKAN_REAL_D1_UUID_JIKA_GUNA_CLI"
