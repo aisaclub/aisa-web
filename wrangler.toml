@@ -1,0 +1,9 @@
+name = "aisa-uitm-web"
+compatibility_date = "2026-10-01"
+pages_build_output_dir = "dist"
+
+# Optional Cloudflare D1 Edge Database Binding
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "aisa-db"
+# database_id = "<your-d1-database-id-from-cloudflare-dash>"
