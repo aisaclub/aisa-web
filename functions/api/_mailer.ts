@@ -16,12 +16,14 @@ export async function sendRealEmail({
   apiKey,
   fromName = 'AISA UiTM Melaka Jasin',
 }: SendEmailOptions): Promise<{ sent: boolean; status: string; data?: any; error?: string }> {
-  // If no Resend API key is supplied in Cloudflare Environment variables, return simulated success
-  if (!apiKey || apiKey.trim() === '') {
+  // Read apiKey passed from Cloudflare Pages context.env.RESEND_API_KEY
+  const effectiveKey = apiKey && apiKey.trim() !== '' ? apiKey.trim() : null;
+
+  if (!effectiveKey) {
     return {
       sent: false,
       status: 'LOGGED_TO_D1_ONLY',
-      data: { message: 'Emel direkodkan ke D1 database. Tambah RESEND_API_KEY di Cloudflare Dashboard untuk penghantaran emel sebenar ke peti masuk pelajar.' },
+      data: { message: 'Emel direkodkan ke D1 database. Tambah RESEND_API_KEY di Cloudflare Pages > Settings > Environment variables untuk penghantaran emel sebenar.' },
     };
   }
 
@@ -29,7 +31,7 @@ export async function sendRealEmail({
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${effectiveKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
