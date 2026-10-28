@@ -70,9 +70,9 @@ export const TeaserVideoModal: React.FC<TeaserVideoModalProps> = ({ isOpen, onCl
       return;
     }
 
-    let interval: ReturnType<typeof setInterval>;
+    let interval: any;
     if (isPlaying) {
-      interval = setInterval(() => {
+      interval = window.setInterval(() => {
         setCurrentTime((prev) => {
           if (prev >= totalDuration) {
             setIsPlaying(false);
@@ -83,7 +83,7 @@ export const TeaserVideoModal: React.FC<TeaserVideoModalProps> = ({ isOpen, onCl
       }, 100);
     }
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, [isOpen, isPlaying]);
 
   if (!isOpen) return null;
