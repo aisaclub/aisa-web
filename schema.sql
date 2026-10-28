@@ -2,6 +2,7 @@
 -- Skema Lengkap Pangkalan Data Cloudflare D1
 -- AISA (Artificial Intelligence Student Association)
 -- UiTM Cawangan Melaka Kampus Jasin
+-- Database: aisaclub (ID: 76d5c84e-e67e-48b8-89dc-03745574c676)
 -- ==========================================================
 
 -- 1. Jadual Pensyarah Penasihat (Lecturer Advisors)
@@ -47,7 +48,9 @@ CREATE TABLE IF NOT EXISTS club_registrations (
     semester TEXT NOT NULL,
     ai_interest TEXT NOT NULL,
     membership_id TEXT NOT NULL UNIQUE, -- cth: 'AISA-2026-1042'
-    status TEXT DEFAULT 'Aktif',
+    status TEXT DEFAULT 'Baru',    -- 'Baru', 'Disemak', 'Lulus', 'Perlu Dihubungi'
+    assigned_pic TEXT DEFAULT 'Belum Ditetapkan',
+    exco_notes TEXT,
     registered_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -63,11 +66,14 @@ CREATE TABLE IF NOT EXISTS notice_subscribers (
 CREATE TABLE IF NOT EXISTS announcements (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
-    category TEXT NOT NULL,        -- 'Pertandingan', 'Bengkel', 'Hebahan', 'Notis Penting'
+    category TEXT NOT NULL,        -- 'Pertandingan', 'Bengkel', 'Hebahan', 'Notis Penting', 'Mesyuarat'
     description TEXT NOT NULL,
     date DATE NOT NULL,
     deadline TEXT,
+    event_time TEXT,
+    location TEXT,
     banner_url TEXT NOT NULL,
+    banner_url2 TEXT,
     registration_link TEXT,
     is_urgent BOOLEAN DEFAULT 0,
     status TEXT DEFAULT 'Open',
@@ -79,12 +85,14 @@ CREATE TABLE IF NOT EXISTS activities (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     event_date TEXT NOT NULL,
-    category TEXT NOT NULL,        -- 'Hackathon', 'Workshop', 'Lawatan Industri'
+    category TEXT NOT NULL,        -- 'Hackathon', 'Workshop', 'Lawatan Industri', 'Seminar'
     summary TEXT NOT NULL,
     cover_image TEXT NOT NULL,
-    gallery JSON,
+    gallery TEXT,                  -- JSON string array gambar galeri (1-4 gambar)
     attendees_count INTEGER DEFAULT 0,
     highlight_text TEXT,
+    ai_field TEXT,
+    location TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -95,6 +103,34 @@ CREATE TABLE IF NOT EXISTS email_logs (
     recipient_name TEXT NOT NULL,
     template_type TEXT NOT NULL,   -- 'welcome', 'meeting', 'notice'
     subject TEXT NOT NULL,
+    sent_by TEXT DEFAULT 'Sistem Automasi AISA',
     sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     status TEXT DEFAULT 'Delivered'
 );
+
+-- ==========================================================
+-- CONTOH ARAHAN SQL: LIHAT DATA / BERSIHKAN DATA / ALTER TABLE
+-- ==========================================================
+
+-- A. CARA LIHAT DATA (QUERY INSERTED DATA)
+-- SELECT * FROM club_registrations ORDER BY registered_at DESC;
+-- SELECT * FROM email_logs ORDER BY sent_at DESC;
+-- SELECT * FROM announcements;
+-- SELECT * FROM notice_subscribers;
+
+-- B. CARA BERSIHKAN SEMUA DATA (CLEAN / WIPE DATA)
+-- DELETE FROM club_registrations;
+-- DELETE FROM email_logs;
+-- DELETE FROM notice_subscribers;
+-- DELETE FROM announcements;
+-- DELETE FROM activities;
+
+-- C. CONTOH ARAHAN ALTER TABLE (MENAMBAH KOLUM BARU JIKA PERLU)
+-- ALTER TABLE club_registrations ADD COLUMN assigned_pic TEXT DEFAULT 'Belum Ditetapkan';
+-- ALTER TABLE club_registrations ADD COLUMN exco_notes TEXT;
+-- ALTER TABLE announcements ADD COLUMN banner_url2 TEXT;
+-- ALTER TABLE announcements ADD COLUMN event_time TEXT;
+-- ALTER TABLE announcements ADD COLUMN location TEXT;
+-- ALTER TABLE activities ADD COLUMN ai_field TEXT;
+-- ALTER TABLE activities ADD COLUMN location TEXT;
+-- ALTER TABLE email_logs ADD COLUMN sent_by TEXT DEFAULT 'Sistem Automasi AISA';
