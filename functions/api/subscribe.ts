@@ -56,7 +56,11 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
           'Pelanggan Notis',
           'subscribe_confirm',
           '[AISA UiTM Jasin] Pengesahan Langganan Buletin & Notis Rasmi',
-          mailResult.sent ? 'Resend API (Delivered)' : 'Sistem Langganan D1'
+          mailResult.status === 'DELIVERED_VIA_GMAIL'
+            ? 'Gmail Relay (aisaclub.uitmjasin@gmail.com)'
+            : mailResult.sent
+            ? 'Resend API (Delivered)'
+            : 'Sistem Langganan D1'
         )
         .run();
     }

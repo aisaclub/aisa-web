@@ -78,7 +78,11 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
           data.fullName,
           'welcome',
           `[AISA UiTM Jasin] Kad Keahlian Digital & Pengesahan Ahli (${membershipId})`,
-          mailResult.sent ? 'Resend API (Delivered)' : 'Sistem Pendaftaran D1'
+          mailResult.status === 'DELIVERED_VIA_GMAIL'
+            ? 'Gmail Relay (aisaclub.uitmjasin@gmail.com)'
+            : mailResult.sent
+            ? 'Resend API (Delivered)'
+            : 'Sistem Pendaftaran D1'
         )
         .run();
     }
