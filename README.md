@@ -101,7 +101,24 @@ Sistem ini dioptimumkan untuk hos percuma berkelajuan tinggi di **Cloudflare Pag
 * **Integrasi Pensyarah Penasihat KPPIM**: Memaparkan bilik pensyarah, waktu konsultasi, bidang kepakaran AI, dan emel rasmi UiTM.
 * **Kad Profil Interaktif**: Memaparkan butiran biro, projek GitHub, akaun LinkedIn, dan kepakaran khusus setiap Exco.
 
-### 3. 📝 Pendaftaran Ahli Native & Sistem Langganan Notis
+### 3. 📝 Pendaftaran Ahli Native (Terbuka Kepada Semua Kursus FSKM & FPA)
+* **Terbuka Tanpa Diskriminasi**: Terbuka kepada seluruh pelajar UiTM Melaka Kampus Jasin merangkumi:
+  * **FSKM / KPPIM (Sarjana Muda)**:
+    * `CS230` – Bachelor of Computer Science (Hons.) / Sarjana Muda Sains Komputer (Kepujian)
+    * `CS251` – Bachelor of Computer Science (Hons.) Computer Networks / Data Communication and Networking
+    * `CS255` – Bachelor of Computer Science (Hons.) Computer Networks
+    * `CS266` – Bachelor of Information Technology (Hons.) Information Systems Engineering
+  * **FSKM / KPPIM (Diploma)**:
+    * `CS110` – Diploma in Computer Science (Diploma Sains Komputer)
+  * **Fakulti Perladangan & Agroteknologi - FPA (Sarjana Muda)**:
+    * `AT228` – Bachelor of Technology Smart Crop Production with Honours
+    * `AT234` – Bachelor of Science in Horticulture Technology (Honours)
+    * `AT240` – Bachelor in Plantation Management Technology with Honours
+    * `AT242` – Bachelor of Science in Agronomy with Honours
+    * `AT243` – Bachelor of Science in Agribusiness (Honours)
+  * **Fakulti Perladangan & Agroteknologi - FPA (Diploma)**:
+    * `AT110` – Diploma in Plantation Industry Management
+  * **Program Terbuka**: Pelajar daripada mana-mana fakulti lain di UiTM Cawangan Melaka.
 * **100% Borang Native (Bukan Google Form)**: Data dimasukkan terus ke Cloudflare D1.
 * **Auto-Generated Digital Membership ID**: Menjana ID unik (cth: `AISA-2026-8492`) dan kad keahlian digital.
 * **Peti Langganan Notis Sahaja (Bukan Ahli)**: Membolehkan pelajar luar dan komuniti kampus melanggan hebahan pertandingan dan bengkel secara spesifik. Setiap langganan merekodkan status penerimaan ke `email_logs`.

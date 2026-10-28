@@ -35,7 +35,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenGame, onOpenVide
                 UiTM CAWANGAN MELAKA • KAMPUS JASIN
               </span>
               <span className="text-slate-500">|</span>
-              <span className="text-xs text-indigo-300 font-semibold">KPPIM FSKM</span>
+              <span className="text-xs text-indigo-300 font-semibold">FSKM & FPA • TERBUKA SEMUA KURSUS</span>
             </div>
 
             {/* Main Headline */}
@@ -48,7 +48,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenGame, onOpenVide
 
             {/* Sub-description */}
             <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed mb-8">
-              Wadah rasmi penggerak inovasi kecerdasan buatan, pembangunan ejen autonomi, penglihatan komputer dan sains data bagi mahasiswa UiTM Melaka Kampus Jasin.
+              Wadah rasmi penggerak inovasi kecerdasan buatan, sains komputer, sistem maklumat dan teknologi pintar (<strong className="text-cyan-300">Computing, Networks & Smart Agrotech</strong>) — terbuka kepada seluruh mahasiswa semua kursus di UiTM Melaka Kampus Jasin.
             </p>
 
             {/* CTAs */}

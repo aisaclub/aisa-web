@@ -117,7 +117,7 @@ export const EmailTemplateModal: React.FC<EmailTemplateModalProps> = ({
               </div>
               <div>
                 <span className="font-space font-bold text-white text-sm block">AISA UiTM MELAKA</span>
-                <span className="text-[10px] text-slate-400 font-mono-code">KAMPUS JASIN • KPPIM FSKM</span>
+                <span className="text-[10px] text-slate-400 font-mono-code">KAMPUS JASIN • FSKM & FPA (OPEN TO ALL COURSES)</span>
               </div>
             </div>
             <span className="text-[10px] font-mono-code text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2 py-0.5 rounded-md">

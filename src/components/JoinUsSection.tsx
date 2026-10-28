@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ClubRegistration, NoticeSubscriber } from '../types';
-import { UserCheck, Sparkles, Send, Bell, CheckCircle2, ShieldCheck, Mail, Phone, Hash, BookOpen } from 'lucide-react';
+import { UserCheck, Sparkles, Send, Bell, CheckCircle2, ShieldCheck, Mail, Phone, Hash, BookOpen, Sprout } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface JoinUsSectionProps {
@@ -20,9 +20,9 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
     studentId: '',
     email: '',
     phoneNumber: '',
-    program: 'CS251 - Sarjana Muda Sains Komputer (Kepintaran Buatan)',
+    program: 'CS230 – Sarjana Muda Sains Komputer (Kepujian)',
     semester: 'Semester 1',
-    aiInterest: 'Autonomous Agents & LLMs',
+    aiInterest: 'Autonomous Agents & Large Language Models (LLM)',
   });
 
   const [registeredSuccess, setRegisteredSuccess] = useState<ClubRegistration | null>(null);
@@ -99,7 +99,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
           <div className="lg:col-span-5 flex flex-col justify-between h-full">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono-code font-semibold mb-3">
-                <UserCheck className="w-3.5 h-3.5" /> PENDAFTARAN KEAHLIAN SESI 2026/2027
+                <UserCheck className="w-3.5 h-3.5" /> KEAHLIAN TERBUKA KEPADA SEMUA KURSUS (FSKM & FPA)
               </div>
               <h2 className="text-3xl sm:text-5xl font-black text-white font-space tracking-tight leading-tight mb-4">
                 Sertai Revolusi AI Bersama{' '}
@@ -108,7 +108,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                 </span>
               </h2>
               <p className="text-sm text-slate-300 leading-relaxed mb-8">
-                Terbuka kepada semua mahasiswa KPPIM/FSKM UiTM Melaka Kampus Jasin. Dapatkan akses ke makmal superkomputer, bimbingan terus pensyarah penasihat, latihan hackathon intensif, dan sistem notis peringatan mesyuarat automatik ke emel anda!
+                Terbuka kepada <strong className="text-white">seluruh mahasiswa UiTM Cawangan Melaka Kampus Jasin</strong> — sama ada daripada <strong className="text-cyan-400">FSKM / KPPIM (Sains Komputer & IT)</strong> mahupun <strong className="text-emerald-400">FPA (Perladangan & Agroteknologi)</strong> serta kursus-kursus lain! Dari pembangunan model LLM, keselamatan rangkaian, hinggalah ke aplikasi <em>Smart Agriculture AI & Drone Vision</em>, semua dialu-alukan.
               </p>
 
               {/* Membership Perks List */}
@@ -122,7 +122,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                       Kad Keahlian Digital Rasmi
                     </h4>
                     <p className="text-[11px] text-slate-400 mt-0.5">
-                      Diberikan ID Keahlian rasmi yang diiktiraf fakulti dan pautan automatik ke Discord rasmi.
+                      Diberikan ID Keahlian rasmi yang diiktiraf universiti dan akses penuh ke ekosistem AI AISA.
                     </p>
                   </div>
                 </div>
@@ -137,6 +137,20 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                     </h4>
                     <p className="text-[11px] text-slate-400 mt-0.5">
                       Emel peringatan bertema cyber automatik dihantar terus bagi setiap perjumpaan rasmi dan pendaftaran bengkel.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-900/80 border border-emerald-500/30">
+                  <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
+                    <Sprout className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-white font-space">
+                      Kolaborasi Interdisiplinari (FSKM + FPA)
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Peluang bina projek rentas bidang: Computing, AI Networks & Smart Crop Tech (IoT ladang, dron pintar & pengesanan penyakit tanaman).
                     </p>
                   </div>
                 </div>
@@ -304,26 +318,64 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                     {/* Program */}
                     <div>
                       <label className="text-xs font-bold text-slate-300 block mb-1">
-                        Kod & Program Pengajian (KPPIM)
+                        Kod & Program Pengajian (Terbuka Semua Kursus) *
                       </label>
                       <select
                         value={formData.program}
                         onChange={(e) => setFormData({ ...formData, program: e.target.value })}
                         className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                        required
                       >
-                        <option value="CS251 - Sarjana Muda Sains Komputer (Kepintaran Buatan)">
-                          CS251 - Sarjana Muda Sains Komputer (Kepintaran Buatan)
-                        </option>
-                        <option value="CS245 - Sarjana Muda Sains Komputer">
-                          CS245 - Sarjana Muda Sains Komputer
-                        </option>
-                        <option value="CS240 - Sarjana Muda Teknologi Maklumat">
-                          CS240 - Sarjana Muda Teknologi Maklumat
-                        </option>
-                        <option value="CS110 - Diploma Sains Komputer">
-                          CS110 - Diploma Sains Komputer
-                        </option>
-                        <option value="Program Lain (KPPIM)">Program Lain (KPPIM)</option>
+                        <optgroup label="🎓 Sarjana Muda (Degree) — FSKM / KPPIM">
+                          <option value="CS230 – Sarjana Muda Sains Komputer (Kepujian)">
+                            CS230 – Sarjana Muda Sains Komputer (Kepujian) / Bachelor of Computer Science (Hons.)
+                          </option>
+                          <option value="CS251 – Sarjana Muda Sains Komputer (Komunikasi Data dan Rangkaian)">
+                            CS251 – Sarjana Muda Sains Komputer (Komunikasi Data dan Rangkaian) / Computer Networks
+                          </option>
+                          <option value="CS255 – Sarjana Muda Sains Komputer (Rangkaian Komputer)">
+                            CS255 – Sarjana Muda Sains Komputer (Rangkaian Komputer) / Computer Networks
+                          </option>
+                          <option value="CS266 – Sarjana Muda Teknologi Maklumat (Kejuruteraan Sistem Maklumat)">
+                            CS266 – Sarjana Muda Teknologi Maklumat (Kejuruteraan Sistem Maklumat) / ISE
+                          </option>
+                        </optgroup>
+
+                        <optgroup label="📜 Diploma — FSKM / KPPIM">
+                          <option value="CS110 – Diploma Sains Komputer">
+                            CS110 – Diploma Sains Komputer / Diploma in Computer Science
+                          </option>
+                        </optgroup>
+
+                        <optgroup label="🌱 Sarjana Muda (Degree) — FPA (Perladangan & Agroteknologi)">
+                          <option value="AT228 – Bachelor of Technology Smart Crop Production with Honours">
+                            AT228 – Bachelor of Technology Smart Crop Production with Honours
+                          </option>
+                          <option value="AT234 – Bachelor of Science in Horticulture Technology (Honours)">
+                            AT234 – Bachelor of Science in Horticulture Technology (Honours)
+                          </option>
+                          <option value="AT240 – Bachelor in Plantation Management Technology with Honours">
+                            AT240 – Bachelor in Plantation Management Technology with Honours
+                          </option>
+                          <option value="AT242 – Bachelor of Science in Agronomy with Honours">
+                            AT242 – Bachelor of Science in Agronomy with Honours
+                          </option>
+                          <option value="AT243 – Bachelor of Science in Agribusiness (Honours)">
+                            AT243 – Bachelor of Science in Agribusiness (Honours)
+                          </option>
+                        </optgroup>
+
+                        <optgroup label="🌾 Diploma — FPA (Perladangan & Agroteknologi)">
+                          <option value="AT110 – Diploma in Plantation Industry Management">
+                            AT110 – Diploma in Plantation Industry Management (Pengurusan Industri Perladangan)
+                          </option>
+                        </optgroup>
+
+                        <optgroup label="🌐 Program Lain / Terbuka">
+                          <option value="Lain-lain Program / Fakulti (UiTM Cawangan Melaka)">
+                            Lain-lain Program / Fakulti (UiTM Cawangan Melaka Kampus Jasin)
+                          </option>
+                        </optgroup>
                       </select>
                     </div>
 
@@ -359,11 +411,20 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                         <option value="Autonomous Agents & Large Language Models (LLM)">
                           Autonomous Agents & Large Language Models (LLM)
                         </option>
-                        <option value="Computer Vision & Deep Learning">
-                          Computer Vision & Deep Learning
+                        <option value="Computer Vision & Deep Learning (Image / Detection)">
+                          Computer Vision & Deep Learning (Image / Detection)
                         </option>
-                        <option value="Reinforcement Learning & Edge AI">
-                          Reinforcement Learning & Edge AI
+                        <option value="Smart Agriculture & Agrotech AI (IoT, Dron AI, Kesihatan Tanaman)">
+                          Smart Agriculture & Agrotech AI (IoT, Dron AI, Kesihatan Tanaman)
+                        </option>
+                        <option value="Network Security & AI-driven Cyber Defense">
+                          Network Security & AI-driven Cyber Defense
+                        </option>
+                        <option value="Enterprise Information Systems & Cloud AI">
+                          Enterprise Information Systems & Cloud AI
+                        </option>
+                        <option value="Reinforcement Learning & Edge AI / Robotics">
+                          Reinforcement Learning & Edge AI / Robotics
                         </option>
                         <option value="Data Engineering & Predictive Analytics">
                           Data Engineering & Predictive Analytics
