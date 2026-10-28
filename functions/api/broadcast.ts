@@ -5,6 +5,7 @@ import { sendRealEmail, renderBroadcastCampaignEmailHtml } from './_mailer';
 interface Env {
   DB?: any;
   RESEND_API_KEY?: string;
+  GMAIL_RELAY_URL?: string;
 }
 
 export async function onRequestPost(context: { request: Request; env: Env }) {
