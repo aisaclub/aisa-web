@@ -32,15 +32,21 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
   const [subscribeTopic, setSubscribeTopic] = useState('Semua Hebahan & Mesyuarat');
   const [subscribedNoticeModal, setSubscribedNoticeModal] = useState<NoticeSubscriber | null>(null);
 
-  const handleSubmitRegistration = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailStatusMessage, setEmailStatusMessage] = useState<string | null>(null);
+
+  const handleSubmitRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.fullName || !formData.studentId || !formData.email || !formData.phoneNumber) {
       alert('Sila lengkapkan semua medan yang diperlukan!');
       return;
     }
 
+    setIsSubmitting(true);
+    setEmailStatusMessage(null);
+
     const membershipNumber = Math.floor(1000 + Math.random() * 9000);
-    const newReg: ClubRegistration = {
+    const localReg: ClubRegistration = {
       id: `reg-${Date.now()}`,
       fullName: formData.fullName,
       studentId: formData.studentId,
@@ -54,8 +60,43 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
       status: 'Aktif',
     };
 
-    onRegister(newReg);
-    setRegisteredSuccess(newReg);
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          studentId: formData.studentId,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          program: formData.program,
+          semester: formData.semester,
+          aiInterest: formData.aiInterest,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const finalReg = data.registration || localReg;
+        onRegister(finalReg);
+        setRegisteredSuccess(finalReg);
+        if (data.emailSent) {
+          setEmailStatusMessage(`✨ Emel Kad Keahlian Digital telah dihantar ke ${formData.email}!`);
+        } else {
+          setEmailStatusMessage(
+            `⚡ Pendaftaran disimpan ke Cloudflare D1. Nota: Resend mod percubaan menghantar emel ke alamat pemilik (aisaclub.uitmjasin@gmail.com) sehingga domain rasmi disahkan di resend.com/domains.`
+          );
+        }
+      } else {
+        onRegister(localReg);
+        setRegisteredSuccess(localReg);
+      }
+    } catch {
+      onRegister(localReg);
+      setRegisteredSuccess(localReg);
+    } finally {
+      setIsSubmitting(false);
+    }
 
     confetti({
       particleCount: 80,
@@ -65,7 +106,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
     });
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subscribeEmail) return;
 
@@ -75,6 +116,19 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
       subscribedAt: new Date().toISOString().split('T')[0],
       preferredTopic: subscribeTopic,
     };
+
+    try {
+      await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: subscribeEmail,
+          preferredTopic: subscribeTopic,
+        }),
+      });
+    } catch {
+      // Handled silently
+    }
 
     onSubscribeNotice(newSub);
     setSubscribedNoticeModal(newSub);
@@ -212,9 +266,16 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                   <h3 className="text-2xl font-black text-white font-space mb-2">
                     Tahniah, Pendaftaran Berjaya!
                   </h3>
-                  <p className="text-xs text-slate-300 max-w-md mb-6 leading-relaxed">
+                  <p className="text-xs text-slate-300 max-w-md mb-4 leading-relaxed">
                     Selamat datang <strong className="text-cyan-400">{registeredSuccess.fullName}</strong>. ID Keahlian rasmi anda ialah <span className="font-mono-code text-indigo-300 font-bold bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-500/30">{registeredSuccess.membershipId}</span>.
                   </p>
+
+                  {emailStatusMessage && (
+                    <div className="mb-6 p-3.5 rounded-2xl bg-indigo-950/60 border border-indigo-500/30 text-xs text-indigo-200 max-w-lg text-left space-y-1">
+                      <div className="text-[10px] font-mono-code text-indigo-400 font-bold">STATUS PENGHANTARAN EMEL:</div>
+                      <div>{emailStatusMessage}</div>
+                    </div>
+                  )}
 
                   <div className="flex flex-wrap gap-3 justify-center mb-6">
                     <button
@@ -439,10 +500,11 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                   <div className="pt-3">
                     <button
                       type="submit"
-                      className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-bold font-space text-sm shadow-xl shadow-indigo-600/25 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+                      disabled={isSubmitting}
+                      className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 disabled:opacity-60 text-white font-bold font-space text-sm shadow-xl shadow-indigo-600/25 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <Send className="w-4 h-4" />
-                      <span>HANTAR PERMOHONAN & TERIMA ID KEAHLIAN DIGITAL</span>
+                      <Send className={`w-4 h-4 ${isSubmitting ? 'animate-spin' : ''}`} />
+                      <span>{isSubmitting ? 'MEMPROSES & MENGHANTAR EMEL...' : 'HANTAR PERMOHONAN & TERIMA ID KEAHLIAN DIGITAL'}</span>
                     </button>
                   </div>
                 </form>

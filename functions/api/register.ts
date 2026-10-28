@@ -101,7 +101,9 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
         success: true,
         message: 'Pendaftaran berjaya disimpan ke Cloudflare D1!',
         registration,
-        emailSent: true,
+        emailSent: mailResult.sent,
+        emailStatus: mailResult.status,
+        emailDetails: mailResult.data || mailResult.error || null,
       }),
       {
         headers: {

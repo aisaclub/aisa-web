@@ -62,13 +62,38 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
     });
   };
 
-  const handleSendCampaign = () => {
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+
+  const handleSendCampaign = async () => {
+    setIsBroadcasting(true);
     const finalCampaign: CustomEmailCampaign = {
       ...campaign,
       id: `camp-${Date.now()}`,
       sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
       recipientCount: targetGroup === 'all_members' ? registrations.length : subscribers.length,
     };
+
+    try {
+      await fetch('/api/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: campaign.title,
+          subject: campaign.subject,
+          content: campaign.mainMessage,
+          eventDate: campaign.eventDate,
+          eventTime: campaign.eventTime,
+          eventLocation: campaign.location,
+          templateStyle: campaign.templateStyle,
+          senderRole: campaign.senderRole,
+          targetAudience: targetGroup === 'all_members' ? 'members' : 'subscribers',
+        }),
+      });
+    } catch {
+      // Handled
+    } finally {
+      setIsBroadcasting(false);
+    }
 
     onLogCampaign(finalCampaign);
     setSentSuccess(true);

@@ -52,6 +52,10 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
         }
       }
 
+      if (campaign.customRecipients && Array.isArray(campaign.customRecipients)) {
+        emailsToSend.push(...campaign.customRecipients);
+      }
+
       // Deduplicate emails
       const uniqueEmails = Array.from(new Set(emailsToSend));
 
@@ -87,7 +91,8 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Kempen emel berjaya direkod dan dihantar melalui Cloudflare D1!',
+        sentCount,
+        message: `Kempen emel berjaya diproses! (${sentCount} emel dihantar melalui Resend API)`,
         campaign,
       }),
       {

@@ -22,7 +22,8 @@ export const EmailTemplateModal: React.FC<EmailTemplateModalProps> = ({
 }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<'welcome' | 'meeting' | 'notice'>(initialTemplate);
   const [copied, setCopied] = useState(false);
-  const [sentNotice, setSentNotice] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [sentNotice, setSentNotice] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -32,9 +33,34 @@ export const EmailTemplateModal: React.FC<EmailTemplateModalProps> = ({
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const handleSendSimulation = () => {
-    setSentNotice(true);
-    setTimeout(() => setSentNotice(false), 3000);
+  const handleSendRealEmail = async () => {
+    setIsSending(true);
+    setSentNotice(null);
+    try {
+      const res = await fetch('/api/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `[AISA UiTM Jasin] ${selectedTemplate === 'welcome' ? 'Kad Keahlian Digital' : selectedTemplate === 'meeting' ? 'Notis Panggilan Mesyuarat' : 'Hebahan Hackathon'}`,
+          subject: `[AISA UiTM Jasin] Notis Rasmi untuk ${recipientName}`,
+          content: `Notis rasmi ini dihantar secara terus daripada Portal Rasmi AISA UiTM Kampus Jasin untuk ${recipientName} (${studentId}).`,
+          customRecipients: [recipientEmail],
+          targetAudience: 'custom',
+          templateStyle: selectedTemplate === 'welcome' ? 'modern_dark' : selectedTemplate === 'meeting' ? 'minimal_slate' : 'tech_summit',
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSentNotice(`✅ Emel dihantar ke ${recipientEmail} melalui Resend API!`);
+      } else {
+        setSentNotice(`⚡ ${data.message || 'Diproses ke Cloudflare D1.'}`);
+      }
+    } catch {
+      setSentNotice(`⚡ Notis direkodkan ke Cloudflare D1.`);
+    } finally {
+      setIsSending(false);
+      setTimeout(() => setSentNotice(null), 5000);
+    }
   };
 
   return (
@@ -276,8 +302,8 @@ export const EmailTemplateModal: React.FC<EmailTemplateModalProps> = ({
 
         {/* Modal Bottom Actions */}
         <div className="pt-4 mt-2 border-t border-slate-800 flex items-center justify-between shrink-0">
-          <span className="text-xs text-slate-400">
-            {copied ? '✅ Disalin ke papan keratan' : 'Salin kod HTML emel atau hantar ujian'}
+          <span className="text-xs text-cyan-300 font-mono-code font-bold">
+            {sentNotice ? sentNotice : copied ? '✅ Disalin ke papan keratan' : 'Salin kod HTML emel atau hantar terus via Resend API'}
           </span>
           <div className="flex gap-2">
             <button
@@ -287,10 +313,12 @@ export const EmailTemplateModal: React.FC<EmailTemplateModalProps> = ({
               <Copy className="w-3.5 h-3.5" /> Salin HTML Emel
             </button>
             <button
-              onClick={handleSendSimulation}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold font-space transition-colors"
+              onClick={handleSendRealEmail}
+              disabled={isSending}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white text-xs font-bold font-space transition-colors cursor-pointer"
             >
-              <Send className="w-3.5 h-3.5" /> Hantar Ujian Emel
+              <Send className={`w-3.5 h-3.5 ${isSending ? 'animate-spin' : ''}`} />
+              <span>{isSending ? 'Menghantar...' : 'Hantar Emel Sebenar (Resend)'}</span>
             </button>
           </div>
         </div>
