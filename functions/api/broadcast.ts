@@ -33,19 +33,20 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
     let sentCount = 0;
 
     // If D1 is available, fetch real emails based on target audience
-    if (context.env.DB) {
+    const db = context.env.DB || (context.env as any)['context.env.DB'];
+    if (db) {
       const target = campaign.targetAudience || 'all';
       let emailsToSend: string[] = [];
 
       if (target === 'subscribers' || target === 'all') {
-        const { results: subResults } = await context.env.DB.prepare('SELECT email FROM notice_subscribers').all();
+        const { results: subResults } = await db.prepare('SELECT email FROM notice_subscribers').all();
         if (subResults) {
           emailsToSend.push(...subResults.map((r: any) => r.email));
         }
       }
 
       if (target === 'members' || target === 'all') {
-        const { results: regResults } = await context.env.DB.prepare('SELECT email FROM club_registrations').all();
+        const { results: regResults } = await db.prepare('SELECT email FROM club_registrations').all();
         if (regResults) {
           emailsToSend.push(...regResults.map((r: any) => r.email));
         }
@@ -69,7 +70,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
 
       // Log broadcast in email_logs
       const logId = `camp-log-${Date.now()}`;
-      await context.env.DB.prepare(
+      await db.prepare(
         'INSERT INTO email_logs (id, recipient_email, recipient_name, template_type, subject, sent_by) VALUES (?, ?, ?, ?, ?, ?)'
       )
         .bind(
@@ -104,10 +105,11 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
   }
 }
 
-export async function onRequestGet(context: { env: Env }) {
+export async function onRequestGet(context: { env: any }) {
   try {
-    if (context.env.DB) {
-      const { results } = await context.env.DB.prepare(
+    const db = context.env.DB || context.env['context.env.DB'];
+    if (db) {
+      const { results } = await db.prepare(
         'SELECT * FROM email_logs ORDER BY sent_at DESC LIMIT 50'
       ).all();
       return new Response(JSON.stringify(results), {

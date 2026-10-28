@@ -36,15 +36,16 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
     });
 
     // 2. If Cloudflare D1 is available at the Edge
-    if (context.env.DB) {
-      await context.env.DB.prepare(
+    const db = context.env.DB || (context.env as any)['context.env.DB'];
+    if (db) {
+      await db.prepare(
         'INSERT OR REPLACE INTO notice_subscribers (id, email, preferred_topic, subscribed_at) VALUES (?, ?, ?, ?)'
       )
         .bind(subscriberId, data.email, preferredTopic, subscribedAt)
         .run();
 
       const logId = `log-${Date.now()}`;
-      await context.env.DB.prepare(
+      await db.prepare(
         'INSERT INTO email_logs (id, recipient_email, recipient_name, template_type, subject, sent_by) VALUES (?, ?, ?, ?, ?, ?)'
       )
         .bind(
@@ -86,10 +87,11 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
   }
 }
 
-export async function onRequestGet(context: { env: Env }) {
+export async function onRequestGet(context: { env: any }) {
   try {
-    if (context.env.DB) {
-      const { results } = await context.env.DB.prepare(
+    const db = context.env.DB || context.env['context.env.DB'];
+    if (db) {
+      const { results } = await db.prepare(
         'SELECT * FROM notice_subscribers ORDER BY subscribed_at DESC'
       ).all();
       return new Response(JSON.stringify(results), {

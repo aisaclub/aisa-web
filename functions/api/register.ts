@@ -40,9 +40,11 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       apiKey: context.env.RESEND_API_KEY,
     });
 
-    if (context.env.DB) {
+    const db = context.env.DB || (context.env as any)['context.env.DB'];
+
+    if (db) {
       // 2. Insert into club_registrations table
-      await context.env.DB.prepare(
+      await db.prepare(
         `INSERT INTO club_registrations (
           id, full_name, student_id, email, phone_number, program, semester, ai_interest, membership_id, status, assigned_pic, registered_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -65,7 +67,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
 
       // 3. Log confirmation email into email_logs table
       const logId = `log-${Date.now()}`;
-      await context.env.DB.prepare(
+      await db.prepare(
         'INSERT INTO email_logs (id, recipient_email, recipient_name, template_type, subject, sent_by) VALUES (?, ?, ?, ?, ?, ?)'
       )
         .bind(
@@ -116,10 +118,11 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
   }
 }
 
-export async function onRequestGet(context: { env: Env }) {
+export async function onRequestGet(context: { env: any }) {
   try {
-    if (context.env.DB) {
-      const { results } = await context.env.DB.prepare(
+    const db = context.env.DB || context.env['context.env.DB'];
+    if (db) {
+      const { results } = await db.prepare(
         'SELECT * FROM club_registrations ORDER BY registered_at DESC'
       ).all();
       return new Response(JSON.stringify(results), {
