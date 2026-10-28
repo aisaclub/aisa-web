@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CommitteeMember, Announcement, Activity, ClubRegistration, NoticeSubscriber, LecturerAdvisor, AI_RESEARCH_FIELDS } from '../types';
 import { X, Save, User, Bell, History, Database, Check, Users, Mail, Send, Download, Sparkles, RefreshCw, GraduationCap, Trash2, Upload, Image as ImageIcon, Calendar, Clock, MapPin, Award, Cpu, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { formatMalayDate } from '../utils/dateFormatter';
 
 interface AdminPortalModalProps {
   isOpen: boolean;
@@ -694,6 +695,14 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono-code"
                     required
                   />
+                  {newAnn.date && (
+                    <div className="mt-1.5 px-2.5 py-1 rounded-lg bg-cyan-950/60 border border-cyan-500/30 text-[11px] font-mono-code text-cyan-300 flex items-center justify-between">
+                      <span><strong>HARI:</strong> {formatMalayDate(newAnn.date).dayName}</span>
+                      <span><strong>TARIKH:</strong> {formatMalayDate(newAnn.date).dayNumber}</span>
+                      <span><strong>BULAN:</strong> {formatMalayDate(newAnn.date).monthName}</span>
+                      <span><strong>TAHUN:</strong> {formatMalayDate(newAnn.date).year}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -707,6 +716,14 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                     onChange={(e) => setNewAnn({ ...newAnn, deadline: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono-code"
                   />
+                  {newAnn.deadline && (
+                    <div className="mt-1.5 px-2.5 py-1 rounded-lg bg-amber-950/60 border border-amber-500/30 text-[11px] font-mono-code text-amber-300 flex items-center justify-between">
+                      <span><strong>HARI:</strong> {formatMalayDate(newAnn.deadline).dayName}</span>
+                      <span><strong>TARIKH:</strong> {formatMalayDate(newAnn.deadline).dayNumber}</span>
+                      <span><strong>BULAN:</strong> {formatMalayDate(newAnn.deadline).monthName}</span>
+                      <span><strong>TAHUN:</strong> {formatMalayDate(newAnn.deadline).year}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -899,6 +916,14 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono-code"
                     required
                   />
+                  {newAct.date && (
+                    <div className="mt-1.5 px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-500/30 text-[11px] font-mono-code text-purple-300 flex items-center justify-between">
+                      <span><strong>HARI:</strong> {formatMalayDate(newAct.date).dayName}</span>
+                      <span><strong>TARIKH:</strong> {formatMalayDate(newAct.date).dayNumber}</span>
+                      <span><strong>BULAN:</strong> {formatMalayDate(newAct.date).monthName}</span>
+                      <span><strong>TAHUN:</strong> {formatMalayDate(newAct.date).year}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* TOTAL PESERTA */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ClubRegistration, NoticeSubscriber, EmailDesignStyle } from '../types';
+import { ClubRegistration, NoticeSubscriber, EmailDesignStyle, EMAIL_STYLES_META } from '../types';
 import { UserCheck, Sparkles, Send, Bell, CheckCircle2, ShieldCheck, Mail, Phone, Hash, BookOpen, Sprout, Palette, Layers, Award, Cpu } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -26,6 +26,7 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
   });
 
   const [selectedPassStyle, setSelectedPassStyle] = useState<EmailDesignStyle>('minimalist');
+  const [passCategoryFilter, setPassCategoryFilter] = useState<string>('Semua');
   const [registeredSuccess, setRegisteredSuccess] = useState<ClubRegistration | null>(null);
 
   // Subscribe notice state
@@ -503,108 +504,70 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                       </select>
                     </div>
 
-                    {/* 6 Design Styles for Digital Pass */}
+                    {/* 12 Design Styles for Digital Pass */}
                     <div className="md:col-span-2 pt-2">
-                      <label className="text-xs font-bold text-slate-300 block mb-2 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5 font-mono-code">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
+                        <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5 font-mono-code">
                           <Palette className="w-3.5 h-3.5 text-indigo-400" />
-                          <span>PILIH TEMA KAD KEAHLIAN DIGITAL (EMEL CERAH):</span>
-                        </span>
+                          <span>PILIH TEMA KAD KEAHLIAN DIGITAL (12 GAYA CERAH):</span>
+                        </label>
                         <span className="text-[10px] text-emerald-400 font-mono-code font-bold">
-                          ✓ Tidak Gelap • Mudah Dibaca
+                          ✓ 12 Pilihan Cerah • Kontras Tinggi
                         </span>
-                      </label>
+                      </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {/* 1. Minimalist */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPassStyle('minimalist')}
-                          className={`p-2.5 rounded-xl border text-left transition-all ${
-                            selectedPassStyle === 'minimalist'
-                              ? 'bg-white text-slate-900 border-indigo-500 shadow-md ring-2 ring-indigo-500/30'
-                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          <div className="text-[10px] font-mono-code font-bold text-indigo-600">1. MINIMALIS</div>
-                          <div className="text-xs font-bold text-white group-hover:text-white">Swiss Clean</div>
-                          <div className="text-[10px] text-slate-400 truncate">Putih Bersih Kontras</div>
-                        </button>
+                      {/* Category Filter Pills */}
+                      <div className="flex gap-1.5 overflow-x-auto pb-2 mb-2">
+                        {['Semua', 'Akademik & Rasmi', 'Moden & Kaca', 'Kreatif & Pop', 'Teknologi & Lab'].map((cat) => (
+                          <button
+                            key={cat}
+                            type="button"
+                            onClick={() => setPassCategoryFilter(cat)}
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-mono-code font-bold transition-all shrink-0 ${
+                              passCategoryFilter === cat
+                                ? 'bg-indigo-600 text-white shadow-sm ring-1 ring-indigo-400'
+                                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
 
-                        {/* 2. Glassmorphism */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPassStyle('glassmorphism')}
-                          className={`p-2.5 rounded-xl border text-left transition-all ${
-                            selectedPassStyle === 'glassmorphism'
-                              ? 'bg-cyan-950/70 border-cyan-400 text-cyan-300 shadow-md ring-2 ring-cyan-500/30'
-                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          <div className="text-[10px] font-mono-code font-bold text-cyan-400">2. GLASS</div>
-                          <div className="text-xs font-bold text-white">Glassmorphism</div>
-                          <div className="text-[10px] text-slate-400 truncate">Frosted Glass Cerah</div>
-                        </button>
-
-                        {/* 3. Skeuomorphism */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPassStyle('skeuomorphism')}
-                          className={`p-2.5 rounded-xl border text-left transition-all ${
-                            selectedPassStyle === 'skeuomorphism'
-                              ? 'bg-amber-950/70 border-amber-400 text-amber-300 shadow-md ring-2 ring-amber-500/30'
-                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          <div className="text-[10px] font-mono-code font-bold text-amber-400">3. SKEUO</div>
-                          <div className="text-xs font-bold text-white">Badge Chip</div>
-                          <div className="text-[10px] text-slate-400 truncate">Fizikal Cip Emas</div>
-                        </button>
-
-                        {/* 4. Neo-Brutalism */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPassStyle('neobrutalism')}
-                          className={`p-2.5 rounded-xl border text-left transition-all ${
-                            selectedPassStyle === 'neobrutalism'
-                              ? 'bg-yellow-400 text-black border-2 border-black shadow-[3px_3px_0px_#000] font-bold'
-                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          <div className="text-[10px] font-mono-code font-bold text-black">4. BRUTAL</div>
-                          <div className="text-xs font-bold text-black">Neo-Brutalism</div>
-                          <div className="text-[10px] text-slate-800 truncate">Border Tebal Pop</div>
-                        </button>
-
-                        {/* 5. UiTM Royal */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPassStyle('uitm_royal')}
-                          className={`p-2.5 rounded-xl border text-left transition-all ${
-                            selectedPassStyle === 'uitm_royal'
-                              ? 'bg-purple-950/80 border-purple-400 text-purple-300 shadow-md ring-2 ring-purple-500/30'
-                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          <div className="text-[10px] font-mono-code font-bold text-amber-400">5. UITM ROYAL</div>
-                          <div className="text-xs font-bold text-white">Ungu & Emas</div>
-                          <div className="text-[10px] text-slate-400 truncate">Memorandum Rasmi</div>
-                        </button>
-
-                        {/* 6. Cyber Clean */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPassStyle('cyber_clean')}
-                          className={`p-2.5 rounded-xl border text-left transition-all ${
-                            selectedPassStyle === 'cyber_clean'
-                              ? 'bg-sky-950/70 border-sky-400 text-sky-300 shadow-md ring-2 ring-sky-500/30'
-                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          <div className="text-[10px] font-mono-code font-bold text-sky-400">6. CYBER</div>
-                          <div className="text-xs font-bold text-white">Titanium Clean</div>
-                          <div className="text-[10px] text-slate-400 truncate">Makmal AI Moden</div>
-                        </button>
+                      {/* 12-Style Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-1">
+                        {EMAIL_STYLES_META
+                          .filter((s) => passCategoryFilter === 'Semua' || s.category === passCategoryFilter)
+                          .map((s) => {
+                            const isSelected = selectedPassStyle === s.id;
+                            return (
+                              <button
+                                key={s.id}
+                                type="button"
+                                onClick={() => setSelectedPassStyle(s.id)}
+                                className={`p-2 rounded-xl border text-left transition-all ${
+                                  isSelected
+                                    ? 'bg-white text-slate-900 border-indigo-500 shadow-lg ring-2 ring-indigo-500/30'
+                                    : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-0.5">
+                                  <span className={`text-[9px] font-mono-code font-bold ${isSelected ? 'text-indigo-600' : 'text-cyan-400'}`}>
+                                    {s.num}. {s.name.split(' ')[0].toUpperCase()}
+                                  </span>
+                                  <span className={`text-[8px] font-mono-code px-1 rounded ${isSelected ? 'bg-slate-100 text-slate-700' : 'bg-slate-800 text-slate-400'}`}>
+                                    {s.category.split(' ')[0]}
+                                  </span>
+                                </div>
+                                <div className={`text-xs font-bold truncate ${isSelected ? 'text-slate-950' : 'text-white'}`}>
+                                  {s.name}
+                                </div>
+                                <div className={`text-[10px] truncate ${isSelected ? 'text-slate-600' : 'text-slate-400'}`}>
+                                  {s.tagline}
+                                </div>
+                              </button>
+                            );
+                          })}
                       </div>
                     </div>
                   </div>

@@ -1,12 +1,18 @@
 // Helper module: _mailer.ts
 // Cloudflare Pages Functions email dispatcher supporting Google Apps Script Gmail Relay & Resend API
-// Contains 6 distinct, premium email design styles:
-// 1. Minimalist Academic (Clean White Swiss)
-// 2. Glassmorphism (Frosted Glass Cyber)
-// 3. Skeuomorphism (Physical Tactile Lanyard Badge with Chip)
-// 4. Neo-Brutalism (Bold High-Contrast Tech Summit)
-// 5. UiTM Royal Purple & Corporate Gold (Official University Memo)
-// 6. Cyber Clean Titanium (Modern AI Lab Light)
+// Contains 12 distinct, premium, light & bright email design styles (UI/UX Pro Max certified)
+// 1. minimalist - Swiss Clean Minimalist
+// 2. glassmorphism - Frosted Aurora Glass
+// 3. skeuomorphism - Tactile Smartcard with Gold Chip
+// 4. neobrutalism - Vibrant Neo-Brutalist Pop
+// 5. uitm_royal - UiTM Royal Purple & Corporate Gold
+// 6. cyber_clean - Cyber Titanium AI Lab
+// 7. editorial_serif - Executive Forbes Tech Monograph
+// 8. claymorphism - 3D Soft Clay Bubble
+// 9. ticket_pass - Perforated Hackathon Summit Ticket Pass
+// 10. emerald_agrotech - Botanical Smart Agrotech AI
+// 11. sunset_gradient - Solar Sunset Warm Mesh
+// 12. retro_terminal - Paper Terminal Data Matrix
 
 export type EmailDesignStyle =
   | 'minimalist'
@@ -14,7 +20,13 @@ export type EmailDesignStyle =
   | 'skeuomorphism'
   | 'neobrutalism'
   | 'uitm_royal'
-  | 'cyber_clean';
+  | 'cyber_clean'
+  | 'editorial_serif'
+  | 'claymorphism'
+  | 'ticket_pass'
+  | 'emerald_agrotech'
+  | 'sunset_gradient'
+  | 'retro_terminal';
 
 export interface SendEmailOptions {
   to: string;
@@ -70,8 +82,6 @@ export async function sendRealEmail({
   }
 
   try {
-    // Resend blocks fake domains like example.com with 422 validation_error.
-    // Map example.com to Resend's official sandbox test address: delivered@resend.dev
     const recipient = to.toLowerCase().includes('example.com')
       ? 'delivered@resend.dev'
       : to;
@@ -98,17 +108,19 @@ export async function sendRealEmail({
       return {
         sent: false,
         status: resJson.name || 'API_ERROR',
-        error: resJson.message || JSON.stringify(resJson),
+        error: resJson.message || 'Resend error',
+        data: resJson,
       };
     }
   } catch (err: any) {
-    return { sent: false, status: 'NETWORK_ERROR', error: err.message };
+    return {
+      sent: false,
+      status: 'FETCH_FAILED',
+      error: err.message,
+    };
   }
 }
 
-// -------------------------------------------------------------
-// 1. WELCOME MEMBERSHIP PASS TEMPLATES (6 DISTINCT STYLES)
-// -------------------------------------------------------------
 export interface WelcomeEmailData {
   fullName: string;
   membershipId: string;
@@ -117,6 +129,10 @@ export interface WelcomeEmailData {
   semester: string;
   aiInterest: string;
 }
+
+// -------------------------------------------------------------
+// WELCOME PASS BUILDERS (12 DISTINCT STYLES - ALL BRIGHT & CLEAN)
+// -------------------------------------------------------------
 
 export function renderWelcomeEmailHtml(data: WelcomeEmailData, style: EmailDesignStyle = 'minimalist'): string {
   switch (style) {
@@ -130,572 +146,511 @@ export function renderWelcomeEmailHtml(data: WelcomeEmailData, style: EmailDesig
       return renderWelcomeUiTmRoyal(data);
     case 'cyber_clean':
       return renderWelcomeCyberClean(data);
+    case 'editorial_serif':
+      return renderWelcomeEditorialSerif(data);
+    case 'claymorphism':
+      return renderWelcomeClaymorphism(data);
+    case 'ticket_pass':
+      return renderWelcomeTicketPass(data);
+    case 'emerald_agrotech':
+      return renderWelcomeEmeraldAgrotech(data);
+    case 'sunset_gradient':
+      return renderWelcomeSunsetGradient(data);
+    case 'retro_terminal':
+      return renderWelcomeRetroTerminal(data);
     case 'minimalist':
     default:
       return renderWelcomeMinimalist(data);
   }
 }
 
-// STYLE 1: Minimalist Academic (Clean White Swiss) - Bright & Professional
+// 1. Minimalist Swiss Clean
 function renderWelcomeMinimalist(data: WelcomeEmailData): string {
   return `<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pengesahan Keahlian AISA</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 35px 15px;">
-    <tr>
-      <td align="center">
-        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); overflow: hidden;">
-          <!-- Top Accent Bar -->
-          <tr>
-            <td style="height: 6px; background: linear-gradient(90deg, #4f46e5, #06b6d4);"></td>
-          </tr>
-          <!-- Header -->
-          <tr>
-            <td style="padding: 32px 30px 20px; border-bottom: 1px solid #f1f5f9;">
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td>
-                    <span style="display: inline-block; padding: 4px 10px; background-color: #e0f2fe; color: #0369a1; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">PENGESAHAN KEAHLIAN RASMI</span>
-                    <h1 style="margin: 12px 0 4px; font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px;">ARTIFICIAL INTELLIGENCE STUDENT ASSOCIATION</h1>
-                    <p style="margin: 0; font-size: 12px; color: #64748b; font-weight: 500;">UiTM Cawangan Melaka Kampus Jasin • FSKM & FPA</p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <!-- Main Content -->
-          <tr>
-            <td style="padding: 28px 30px;">
-              <h2 style="margin: 0 0 10px; font-size: 18px; color: #0f172a;">Selamat Datang, ${data.fullName}!</h2>
-              <p style="margin: 0 0 22px; font-size: 14px; line-height: 1.6; color: #334155;">
-                Permohonan keahlian anda bagi sesi 2026/2027 telah berjaya diluluskan. Kad Keahlian Digital anda kini aktif sepenuhnya dalam ekosistem AISA.
-              </p>
-
-              <!-- Digital Pass Card (Minimalist Clean Slate) -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px; margin-bottom: 24px;">
-                <tr>
-                  <td>
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td>
-                          <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">NO. KEAHLIAN RASMI</span>
-                          <div style="font-size: 22px; font-weight: 900; color: #4338ca; letter-spacing: 1px; margin: 4px 0 16px;">${data.membershipId}</div>
-                        </td>
-                        <td align="right" valign="top">
-                          <span style="display: inline-block; padding: 4px 10px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 11px; font-weight: 700; border-radius: 20px;">AKTIF 2026/2027</span>
-                        </td>
-                      </tr>
-                    </table>
-
-                    <table width="100%" cellpadding="6" cellspacing="0" style="border-top: 1px solid #e2e8f0; padding-top: 12px;">
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b; width: 110px;">Nama Penuh:</td>
-                        <td style="font-size: 13px; font-weight: 700; color: #0f172a;">${data.fullName}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b;">No. Pelajar:</td>
-                        <td style="font-size: 13px; font-family: monospace; font-weight: 600; color: #0f172a;">${data.studentId}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b;">Program:</td>
-                        <td style="font-size: 12px; color: #334155;">${data.program}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b;">Semester:</td>
-                        <td style="font-size: 12px; color: #334155;">${data.semester}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b;">Tumpuan AI:</td>
-                        <td style="font-size: 12px; font-weight: 600; color: #4338ca;">${data.aiInterest}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #475569;">
-                Sebarang hebahan bengkel superkomputer, latihan intensif AI, dan panggilan mesyuarat agung akan dihantar terus ke alamat emel ini.
-              </p>
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 20px 30px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-              <p style="margin: 0; font-size: 11px; color: #64748b; line-height: 1.5;">
-                Dihantar secara rasmi oleh Sistem Pengurusan AISA • UiTM Cawangan Melaka Kampus Jasin, 77300 Merlimau, Melaka.<br>
-                Emel Pertanyaan: <a href="mailto:aisaclub.uitmjasin@gmail.com" style="color: #4338ca; text-decoration: none; font-weight: 600;">aisaclub.uitmjasin@gmail.com</a>
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
-// STYLE 2: Glassmorphism (Frosted Glass Cyber)
-function renderWelcomeGlassmorphism(data: WelcomeEmailData): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Kad Keahlian AISA (Glassmorphism)</title>
-</head>
-<body style="margin: 0; padding: 0; background: #eef2ff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 50%, #eff6ff 100%); padding: 35px 15px;">
-    <tr>
-      <td align="center">
-        <table width="100%" style="max-width: 600px; background: rgba(255, 255, 255, 0.95); border: 2px solid #c7d2fe; border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.15); overflow: hidden;">
-          <!-- Glowing Header -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%); padding: 32px 25px; text-align: center; color: #ffffff;">
-              <span style="display: inline-block; padding: 3px 12px; background: rgba(255, 255, 255, 0.2); border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">KKEAHLIAN DIGITAL 2026</span>
-              <h1 style="margin: 10px 0 4px; font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">ARTIFICIAL INTELLIGENCE STUDENT ASSOCIATION</h1>
-              <p style="margin: 0; font-size: 12px; color: #e0e7ff;">UiTM Melaka Kampus Jasin • FSKM & FPA</p>
-            </td>
-          </tr>
-          <!-- Body -->
-          <tr>
-            <td style="padding: 30px;">
-              <h2 style="margin: 0 0 10px; font-size: 18px; color: #1e1b4b;">Tahniah & Selamat Datang, ${data.fullName}!</h2>
-              <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #334155;">
-                Pendaftaran anda telah disahkan! Di bawah adalah Kad Keahlian Digital anda:
-              </p>
-
-              <!-- Frosted Pass Card -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #f5f3ff 0%, #ecfeff 100%); border: 1.5px solid #a5b4fc; border-radius: 20px; padding: 24px; margin-bottom: 22px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.1);">
-                <tr>
-                  <td>
-                    <span style="font-size: 11px; font-weight: 700; color: #6366f1; text-transform: uppercase;">ID KEAHLIAN RASMI:</span>
-                    <h3 style="margin: 4px 0 15px; font-size: 24px; font-weight: 900; color: #4338ca; letter-spacing: 1px;">${data.membershipId}</h3>
-                    
-                    <table width="100%" cellpadding="5" cellspacing="0">
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b; width: 110px;">Nama:</td>
-                        <td style="font-size: 13px; font-weight: 700; color: #0f172a;">${data.fullName}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b;">No. Pelajar:</td>
-                        <td style="font-size: 13px; font-family: monospace; font-weight: 700; color: #0284c7;">${data.studentId}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b;">Program:</td>
-                        <td style="font-size: 12px; color: #1e293b;">${data.program}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b;">Semester:</td>
-                        <td style="font-size: 12px; color: #1e293b;">${data.semester}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-size: 12px; color: #64748b;">Tumpuan AI:</td>
-                        <td style="font-size: 12px; font-weight: 700; color: #7c3aed;">${data.aiInterest}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.5;">
-                Simpan emel ini sebagai bukti keahlian untuk menghadiri bengkel dan aktiviti persatuan.
-              </p>
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="background: #f8faff; border-top: 1px solid #e0e7ff; padding: 18px; text-align: center; font-size: 11px; color: #64748b;">
-              AISA UiTM Melaka Kampus Jasin • <a href="mailto:aisaclub.uitmjasin@gmail.com" style="color: #4f46e5; font-weight: bold; text-decoration: none;">aisaclub.uitmjasin@gmail.com</a>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
-// STYLE 3: Skeuomorphism (Physical Tactile Lanyard Badge with Chip)
-function renderWelcomeSkeuomorphism(data: WelcomeEmailData): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>AISA Student ID Badge</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #cbd5e1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #e2e8f0; padding: 35px 15px;">
-    <tr>
-      <td align="center">
-        <!-- Lanyard Clip Grommet -->
-        <div style="width: 70px; height: 14px; background: linear-gradient(180deg, #94a3b8 0%, #475569 100%); border-radius: 6px; margin: 0 auto 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);"></div>
-        <div style="width: 44px; height: 10px; background: #0f172a; border-radius: 5px; margin: 0 auto 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);"></div>
-
-        <!-- Physical PVC Badge Card -->
-        <table width="100%" style="max-width: 520px; background: #ffffff; border: 1px solid #cbd5e1; border-bottom: 4px solid #64748b; border-radius: 20px; box-shadow: 0 20px 45px rgba(0,0,0,0.16), 0 5px 15px rgba(0,0,0,0.08); overflow: hidden;">
-          <!-- Top Badge Ribbon -->
-          <tr>
-            <td style="background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%); padding: 20px; text-align: center; border-bottom: 3px solid #f59e0b;">
-              <span style="font-size: 10px; font-weight: 800; color: #fde68a; letter-spacing: 2px;">UNIVERSITI TEKNOLOGI MARA</span>
-              <h2 style="margin: 4px 0 0; color: #ffffff; font-size: 18px; font-weight: 900; letter-spacing: 0.5px;">AISA STUDENT ACCESS PASS</h2>
-              <span style="font-size: 11px; color: #c7d2fe;">KAMPUS JASIN • SESI 2026/2027</span>
-            </td>
-          </tr>
-          <!-- Body Badge Card -->
-          <tr>
-            <td style="padding: 25px 25px 20px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 15px;">
-                <tr>
-                  <!-- Metallic Gold Chip -->
-                  <td width="60" valign="top">
-                    <div style="width: 48px; height: 36px; background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%); border-radius: 6px; border: 1px solid #b45309; box-shadow: inset 0 1px 2px rgba(255,255,255,0.7), 0 2px 4px rgba(0,0,0,0.15); position: relative;">
-                      <div style="width: 20px; height: 34px; border-right: 1px solid #b45309; margin: 0 auto;"></div>
-                    </div>
-                  </td>
-                  <td align="right" valign="top">
-                    <span style="font-size: 10px; color: #64748b; font-weight: bold;">MEMBERSHIP NUMBER</span>
-                    <div style="font-size: 20px; font-weight: 900; color: #1e1b4b; font-family: monospace; letter-spacing: 1px;">${data.membershipId}</div>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Student Details Box -->
-              <table width="100%" cellpadding="5" cellspacing="0" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 16px;">
-                <tr>
-                  <td style="font-size: 12px; color: #64748b; width: 100px;">Nama:</td>
-                  <td style="font-size: 13px; font-weight: 800; color: #0f172a;">${data.fullName}</td>
-                </tr>
-                <tr>
-                  <td style="font-size: 12px; color: #64748b;">No. Matrik:</td>
-                  <td style="font-size: 13px; font-family: monospace; font-weight: 700; color: #1e293b;">${data.studentId}</td>
-                </tr>
-                <tr>
-                  <td style="font-size: 12px; color: #64748b;">Program:</td>
-                  <td style="font-size: 12px; color: #334155;">${data.program}</td>
-                </tr>
-                <tr>
-                  <td style="font-size: 12px; color: #64748b;">Semester:</td>
-                  <td style="font-size: 12px; color: #334155;">${data.semester}</td>
-                </tr>
-                <tr>
-                  <td style="font-size: 12px; color: #64748b;">Bidang AI:</td>
-                  <td style="font-size: 12px; font-weight: 700; color: #4338ca;">${data.aiInterest}</td>
-                </tr>
-              </table>
-
-              <!-- Hologram Security Foil -->
-              <div style="height: 12px; background: linear-gradient(90deg, #ec4899, #8b5cf6, #06b6d4, #10b981, #f59e0b, #ec4899); border-radius: 4px; opacity: 0.85; margin-bottom: 15px;"></div>
-
-              <div style="text-align: center; font-size: 11px; color: #64748b;">
-                Tunjukkan kad ini semasa pendaftaran acara atau sesi makmal superkomputer.
-              </div>
-            </td>
-          </tr>
-          <!-- Bottom Barcode Area -->
-          <tr>
-            <td style="background: #f1f5f9; border-top: 1px solid #cbd5e1; padding: 12px; text-align: center;">
-              <span style="font-family: monospace; font-size: 14px; letter-spacing: 5px; color: #475569; font-weight: bold;">||| | ||||| || |||| ||||| ||</span>
-              <div style="font-size: 10px; color: #94a3b8; margin-top: 2px;">AUTHENTICATED • AISA UITM JASIN</div>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
-// STYLE 4: Neo-Brutalism (Bold High-Contrast Tech Summit)
-function renderWelcomeNeoBrutalism(data: WelcomeEmailData): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>AISA Registration (Neo-Brutalism)</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #fef08a; font-family: 'Courier New', Courier, monospace, sans-serif; color: #000000;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fef08a; padding: 35px 15px;">
-    <tr>
-      <td align="center">
-        <table width="100%" style="max-width: 560px; background-color: #ffffff; border: 3px solid #000000; border-radius: 12px; box-shadow: 8px 8px 0px #000000; overflow: hidden;">
-          <!-- Neo Header -->
-          <tr>
-            <td style="background: #000000; color: #facc15; padding: 22px; text-align: center; border-bottom: 3px solid #000000;">
-              <span style="background: #38bdf8; color: #000000; padding: 2px 8px; font-weight: 900; font-size: 11px; border: 2px solid #000000; display: inline-block;">VERIFIED STUDENT</span>
-              <h1 style="margin: 8px 0 2px; font-size: 22px; font-weight: 900; letter-spacing: 0px;">AISA // UITM JASIN</h1>
-              <p style="margin: 0; font-size: 11px; color: #ffffff;">OFFICIAL AI COMMUNITY // FSKM & FPA</p>
-            </td>
-          </tr>
-          <!-- Content -->
-          <tr>
-            <td style="padding: 26px;">
-              <div style="background: #a7f3d0; border: 2px solid #000000; box-shadow: 4px 4px 0px #000000; padding: 10px 14px; font-weight: 900; font-size: 13px; margin-bottom: 18px;">
-                STATUS: REGISTERED AND ACTIVE (2026/2027)
-              </div>
-
-              <h2 style="font-size: 18px; margin: 0 0 10px; font-weight: 900;">HELLO ${data.fullName.toUpperCase()}!</h2>
-              <p style="font-size: 13px; line-height: 1.6; margin: 0 0 20px;">
-                Permohonan anda telah direkodkan ke dalam database Cloudflare D1. Simpan butiran kad keahlian di bawah:
-              </p>
-
-              <!-- Neo Pass Card -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: #ffffff; border: 3px solid #000000; box-shadow: 5px 5px 0px #000000; border-radius: 8px; padding: 16px; margin-bottom: 22px;">
-                <tr>
-                  <td>
-                    <span style="font-size: 11px; font-weight: 900; color: #64748b;">MEMBER_ID:</span>
-                    <div style="font-size: 24px; font-weight: 900; color: #000000; margin: 2px 0 14px;">${data.membershipId}</div>
-
-                    <table width="100%" cellpadding="4" cellspacing="0" style="font-size: 12px; border-top: 2px dashed #000000; padding-top: 8px;">
-                      <tr>
-                        <td width="90" style="font-weight: 900;">NAMA:</td>
-                        <td>${data.fullName}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-weight: 900;">MATRIK:</td>
-                        <td>${data.studentId}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-weight: 900;">KURSUS:</td>
-                        <td>${data.program}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-weight: 900;">SEMESTER:</td>
-                        <td>${data.semester}</td>
-                      </tr>
-                      <tr>
-                        <td style="font-weight: 900;">MINAT AI:</td>
-                        <td style="color: #4338ca; font-weight: bold;">${data.aiInterest}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="font-size: 12px; line-height: 1.5; margin: 0;">
-                Sebarang pertanyaan sila hubungi: <a href="mailto:aisaclub.uitmjasin@gmail.com" style="color: #000000; font-weight: 900;">aisaclub.uitmjasin@gmail.com</a>
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
-// STYLE 5: UiTM Royal Purple & Corporate Gold (Official University Memo)
-function renderWelcomeUiTmRoyal(data: WelcomeEmailData): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Pengesahan Pendaftaran AISA UiTM</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #faf5ff; font-family: Georgia, 'Times New Roman', serif; color: #1e1b4b;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #faf5ff; padding: 35px 15px;">
-    <tr>
-      <td align="center">
-        <table width="100%" style="max-width: 600px; background-color: #ffffff; border: 2px solid #581c87; border-radius: 10px; box-shadow: 0 10px 30px rgba(88, 28, 135, 0.1); overflow: hidden;">
-          <!-- UiTM Purple Header with Gold Border -->
-          <tr>
-            <td style="background: #3b0764; color: #ffffff; padding: 30px 25px; text-align: center; border-bottom: 4px solid #d97706;">
-              <span style="font-size: 11px; letter-spacing: 1px; color: #fde68a; text-transform: uppercase;">UNIVERSITI TEKNOLOGI MARA</span>
-              <h1 style="margin: 6px 0 2px; font-size: 21px; font-weight: bold; color: #fbbf24; letter-spacing: 0.5px;">ARTIFICIAL INTELLIGENCE STUDENT ASSOCIATION</h1>
-              <p style="margin: 0; font-size: 12px; color: #e9d5ff;">Cawangan Melaka Kampus Jasin • FSKM & FPA</p>
-            </td>
-          </tr>
-          <!-- Body -->
-          <tr>
-            <td style="padding: 30px 28px;">
-              <div style="border-left: 4px solid #7c3aed; background: #faf5ff; padding: 10px 14px; margin-bottom: 20px;">
-                <span style="font-size: 11px; font-weight: bold; color: #6b21a8; text-transform: uppercase;">SURAT PENGESAHAN KEAHLIAN RASMI SESI 2026/2027</span>
-              </div>
-
-              <h2 style="font-size: 18px; margin: 0 0 12px; color: #3b0764;">Tahniah & Selamat Datang, ${data.fullName}!</h2>
-              <p style="font-size: 14px; line-height: 1.7; color: #334155; margin: 0 0 22px;">
-                Sukacita dimaklumkan bahawa permohonan pendaftaran anda sebagai ahli berdaftar persatuan AISA bagi sesi akademik ini telah diluluskan. Di bawah adalah maklumat pendaftaran rasmi anda:
-              </p>
-
-              <!-- Formal Academic Card -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: #faf5ff; border: 1.5px solid #d8b4fe; border-left: 6px solid #d97706; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
-                <tr>
-                  <td>
-                    <span style="font-size: 11px; color: #6b21a8; text-transform: uppercase; font-weight: bold;">NOMBOR KEAHLIAN:</span>
-                    <h3 style="margin: 3px 0 14px; font-size: 22px; color: #3b0764; font-weight: bold;">${data.membershipId}</h3>
-
-                    <table width="100%" cellpadding="5" cellspacing="0" style="font-size: 13px;">
-                      <tr>
-                        <td width="110" style="color: #6b21a8; font-weight: bold;">Nama Penuh:</td>
-                        <td style="color: #1e1b4b; font-weight: bold;">${data.fullName}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #6b21a8; font-weight: bold;">No. Pelajar:</td>
-                        <td style="color: #1e1b4b; font-family: monospace;">${data.studentId}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #6b21a8; font-weight: bold;">Program:</td>
-                        <td style="color: #334155;">${data.program}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #6b21a8; font-weight: bold;">Semester:</td>
-                        <td style="color: #334155;">${data.semester}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #6b21a8; font-weight: bold;">Tumpuan AI:</td>
-                        <td style="color: #6b21a8; font-weight: bold;">${data.aiInterest}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="font-size: 13px; line-height: 1.6; color: #475569; margin: 0;">
-                Semua hebahan mesyuarat agung, latihan amali, dan persidangan akan dimaklumkan secara berkala ke peti masuk ini.
-              </p>
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 18px; background: #faf5ff; border-top: 1px solid #e9d5ff; text-align: center; font-size: 11px; color: #6b21a8;">
-              Kolej Pengajian Pengkomputeran, Informatik & Matematik (KPPIM) • UiTM Cawangan Melaka Kampus Jasin<br>
-              Hubungi: <a href="mailto:aisaclub.uitmjasin@gmail.com" style="color: #3b0764; font-weight: bold;">aisaclub.uitmjasin@gmail.com</a>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
-// STYLE 6: Cyber Clean Titanium (Modern AI Lab Light)
-function renderWelcomeCyberClean(data: WelcomeEmailData): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>AISA Membership Pass</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f1f5f9; padding: 35px 15px;">
-    <tr>
-      <td align="center">
-        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1.5px solid #0284c7; border-radius: 20px; box-shadow: 0 15px 35px rgba(2, 132, 199, 0.1); overflow: hidden;">
-          <!-- Titanium Sapphire Header -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #0f172a 0%, #0369a1 100%); padding: 26px 22px; text-align: center; color: #ffffff;">
-              <div style="height: 3px; background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8); margin-bottom: 12px; border-radius: 2px;"></div>
-              <span style="font-size: 10px; font-weight: 800; color: #38bdf8; letter-spacing: 1.5px;">ARTIFICIAL INTELLIGENCE RESEARCH LAB</span>
-              <h1 style="margin: 6px 0 2px; font-size: 20px; font-weight: 900; letter-spacing: 0.5px;">AISA DIGITAL PASSPORT</h1>
-              <p style="margin: 0; font-size: 11px; color: #bae6fd;">UiTM Melaka Kampus Jasin // FSKM & FPA</p>
-            </td>
-          </tr>
-          <!-- Body -->
-          <tr>
-            <td style="padding: 28px 24px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
-                <tr>
-                  <td>
-                    <span style="font-size: 11px; font-weight: 700; color: #0284c7;">AISA-NODE // VERIFIED</span>
-                    <h2 style="font-size: 17px; margin: 4px 0 0; color: #0f172a;">Selamat Datang, ${data.fullName}</h2>
-                  </td>
-                  <td align="right">
-                    <span style="font-size: 10px; background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; padding: 3px 8px; border-radius: 12px; font-weight: 700;">CLOUD ID ACTIVE</span>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Tech Pass Card -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: #f8fafc; border: 1px solid #bae6fd; border-radius: 14px; padding: 20px; margin-bottom: 20px;">
-                <tr>
-                  <td>
-                    <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">MEMBERSHIP TOKEN:</span>
-                    <h3 style="margin: 2px 0 14px; font-size: 22px; font-weight: 900; color: #0284c7; font-family: monospace;">${data.membershipId}</h3>
-
-                    <table width="100%" cellpadding="5" cellspacing="0" style="font-size: 12px;">
-                      <tr>
-                        <td width="90" style="color: #64748b; font-weight: 600;">Student:</td>
-                        <td style="color: #0f172a; font-weight: 700;">${data.fullName}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #64748b; font-weight: 600;">Matric ID:</td>
-                        <td style="color: #0284c7; font-family: monospace; font-weight: 700;">${data.studentId}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #64748b; font-weight: 600;">Program:</td>
-                        <td style="color: #334155;">${data.program}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #64748b; font-weight: 600;">Semester:</td>
-                        <td style="color: #334155;">${data.semester}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #64748b; font-weight: 600;">AI Domain:</td>
-                        <td style="color: #0284c7; font-weight: 700;">${data.aiInterest}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="font-size: 12px; color: #475569; line-height: 1.5; margin: 0;">
-                Gunakan token keahlian anda untuk akses portal latihan AI dan pendaftaran hackathon rasmi.
-              </p>
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 14px; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b;">
-              AISA Research & Community // <a href="mailto:aisaclub.uitmjasin@gmail.com" style="color: #0284c7; text-decoration: none; font-weight: 700;">aisaclub.uitmjasin@gmail.com</a>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
-// -------------------------------------------------------------
-// 2. NEWSLETTER SUBSCRIBER CONFIRMATION (Clean Light)
-// -------------------------------------------------------------
-export function renderSubscriberEmailHtml(data: { email: string; topic: string }): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Pengesahan Langganan Buletin AISA</title>
-</head>
 <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 35px 15px;">
     <tr>
       <td align="center">
-        <table width="100%" style="max-width: 550px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); padding: 30px; overflow: hidden;">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); overflow: hidden;">
+          <tr><td style="height: 6px; background: linear-gradient(90deg, #4f46e5, #06b6d4);"></td></tr>
           <tr>
-            <td>
-              <span style="display: inline-block; padding: 4px 10px; background: #e0f2fe; color: #0369a1; border-radius: 20px; font-size: 11px; font-weight: 700;">AISA UITM JASIN • BULETIN & NOTIS PINTAR</span>
-              <h2 style="color: #0f172a; font-size: 19px; margin: 12px 0 10px;">Pengesahan Langganan Berjaya!</h2>
-              <p style="color: #334155; font-size: 13px; line-height: 1.6; margin: 0 0 16px;">
-                Terima kasih! Emel anda (<strong>${data.email}</strong>) kini telah didaftarkan dalam Cloudflare D1 untuk menerima kemas kini bagi topik:
-              </p>
-              <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px 16px; border-radius: 10px; margin: 0 0 16px; color: #166534; font-weight: 700; font-size: 13px;">
-                📌 Topik Langganan: ${data.topic}
+            <td style="padding: 32px 30px 20px; border-bottom: 1px solid #f1f5f9;">
+              <span style="display: inline-block; padding: 4px 10px; background-color: #e0f2fe; color: #0369a1; border-radius: 20px; font-size: 11px; font-weight: 700;">1. SWISS MINIMALIST // PENGESAHAN KEAHLIAN</span>
+              <h1 style="margin: 12px 0 4px; font-size: 20px; font-weight: 800; color: #0f172a;">ARTIFICIAL INTELLIGENCE STUDENT ASSOCIATION</h1>
+              <p style="margin: 0; font-size: 12px; color: #64748b;">UiTM Cawangan Melaka Kampus Jasin • FSKM & FPA</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px 30px;">
+              <h2 style="margin: 0 0 10px; font-size: 18px; color: #0f172a;">Selamat Datang, ${data.fullName}!</h2>
+              <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #334155;">Permohonan keahlian anda bagi sesi 2026/2027 telah berjaya disahkan. Berikut merupakan butiran rasmi kad keahlian digital anda:</p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 24px;">
+                <tr><td style="font-size: 11px; color: #64748b; font-weight: 700;">ID KEAHLIAN DIGITAL</td><td align="right" style="font-size: 15px; font-weight: 900; color: #4f46e5; font-family: monospace;">${data.membershipId}</td></tr>
+                <tr><td colspan="2" style="height: 12px; border-bottom: 1px solid #e2e8f0;"></td></tr>
+                <tr><td style="padding-top: 12px; font-size: 12px; color: #64748b;">No. Pelajar:</td><td align="right" style="padding-top: 12px; font-size: 12px; font-weight: 700; color: #0f172a; font-family: monospace;">${data.studentId}</td></tr>
+                <tr><td style="padding-top: 8px; font-size: 12px; color: #64748b;">Program:</td><td align="right" style="padding-top: 8px; font-size: 12px; font-weight: 700; color: #0f172a;">${data.program}</td></tr>
+                <tr><td style="padding-top: 8px; font-size: 12px; color: #64748b;">Fokus AI:</td><td align="right" style="padding-top: 8px; font-size: 12px; font-weight: 700; color: #0284c7;">${data.aiInterest}</td></tr>
+              </table>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 28px; background-color: #0f172a; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700;">Masuk ke Portal AISA</a></div>
+            </td>
+          </tr>
+          <tr><td style="padding: 20px 30px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center; font-size: 11px; color: #94a3b8;">Dikeluarkan secara rasmi oleh Sistem Pentadbiran AISA UiTM Jasin • Hak Cipta 2026</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 2. Glassmorphism Aurora Glass
+function renderWelcomeGlassmorphism(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #f5f3ff 100%); font-family: -apple-system, sans-serif; color: #0f172a;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background: rgba(255, 255, 255, 0.92); border: 1.5px solid rgba(6, 182, 212, 0.35); border-radius: 24px; box-shadow: 0 20px 40px rgba(6, 182, 212, 0.12); overflow: hidden;">
+          <tr>
+            <td style="padding: 32px 30px 20px; border-bottom: 1px solid rgba(6, 182, 212, 0.2);">
+              <span style="background: #cffafe; color: #0e7490; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; font-family: monospace;">2. FROSTED AURORA GLASS // VERIFIED PASS</span>
+              <h1 style="margin: 12px 0 2px; font-size: 21px; font-weight: 900; color: #0f172a;">KAD KEAHLIAN CYBER GLASS</h1>
+              <p style="margin: 0; font-size: 12px; color: #0284c7; font-weight: 600;">UiTM Cawangan Melaka Kampus Jasin</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px 30px;">
+              <p style="margin: 0 0 16px; font-size: 14px; color: #334155;">Tahniah <strong>${data.fullName}</strong>, kad keahlian lutsinar berstatus aktif anda telah berjaya dijana:</p>
+              <div style="background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(224,242,254,0.6)); border: 1px solid rgba(6, 182, 212, 0.4); border-radius: 18px; padding: 22px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.08);">
+                <div style="font-size: 10px; color: #0284c7; font-weight: 800; font-family: monospace; letter-spacing: 1px;">AISA DIGITAL CYBER ID</div>
+                <div style="font-size: 22px; font-weight: 900; color: #0369a1; font-family: monospace; margin: 4px 0 12px;">${data.membershipId}</div>
+                <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+                  Pelajar: <strong>${data.studentId}</strong><br>
+                  Program: <strong>${data.program}</strong> (${data.semester})<br>
+                  Bidang AI: <strong style="color: #0891b2;">${data.aiInterest}</strong>
+                </div>
               </div>
-              <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin: 0 0 20px;">
-                Anda akan menerima notis pertandingan, hackathon, dan bengkel terbuka terus ke peti masuk ini.
-              </p>
-              <div style="border-top: 1px solid #f1f5f9; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center;">
-                AISA UiTM Kampus Jasin • <a href="mailto:aisaclub.uitmjasin@gmail.com" style="color: #4338ca; text-decoration: none;">aisaclub.uitmjasin@gmail.com</a>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 30px; background: linear-gradient(90deg, #0284c7, #4f46e5); color: #ffffff; text-decoration: none; border-radius: 14px; font-size: 13px; font-weight: 800; box-shadow: 0 6px 18px rgba(2, 132, 199, 0.25);">Buka Pass Digital</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 3. Skeuomorphism Smartcard with Gold Chip
+function renderWelcomeSkeuomorphism(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background-color: #f1f1ef; font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #1c1917;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <!-- Lanyard Slot -->
+        <div style="width: 70px; height: 12px; background: #d6d3d1; border-radius: 6px; margin-bottom: -6px; border: 1px solid #a8a29e;"></div>
+        <table width="100%" style="max-width: 580px; background-color: #fafaf9; border: 2px solid #d6d3d1; border-radius: 18px; box-shadow: 0 16px 30px rgba(0,0,0,0.08), inset 0 1px 2px #ffffff; overflow: hidden;">
+          <tr>
+            <td style="padding: 26px 30px; border-bottom: 2px solid #e7e5e4;">
+              <table width="100%">
+                <tr>
+                  <td>
+                    <!-- Gold EMV Chip -->
+                    <div style="display: inline-block; width: 44px; height: 32px; background: linear-gradient(135deg, #fde047 0%, #ca8a04 100%); border: 1.5px solid #a16207; border-radius: 6px; box-shadow: inset 0 1px 2px #fef08a, 0 2px 4px rgba(0,0,0,0.1); vertical-align: middle;"></div>
+                    <span style="margin-left: 10px; font-size: 11px; font-family: monospace; font-weight: 800; color: #78716c;">3. TACTILE SMARTCARD // EMV 2026</span>
+                  </td>
+                  <td align="right">
+                    <span style="font-size: 11px; background: #e7e5e4; padding: 4px 10px; border-radius: 6px; font-weight: 700; color: #44403c;">CHIP VERIFIED</span>
+                  </td>
+                </tr>
+              </table>
+              <h1 style="margin: 14px 0 0; font-size: 20px; font-weight: 900; color: #1c1917;">AISA SMART CARD PASS</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 26px 30px;">
+              <p style="margin: 0 0 16px; font-size: 13px; color: #44403c;">Kad keahlian fizikal digital telah diaktifkan untuk <strong>${data.fullName}</strong>:</p>
+              <div style="background: #ffffff; border: 1.5px solid #d6d3d1; border-radius: 12px; padding: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 22px;">
+                <div style="font-size: 11px; color: #78716c; font-weight: bold;">NOMBOR KEAHLIAN PINTAR</div>
+                <div style="font-size: 24px; font-weight: 900; color: #0c0a09; font-family: monospace; letter-spacing: 2px; margin: 4px 0 12px;">${data.membershipId}</div>
+                <div style="font-size: 12px; color: #44403c; line-height: 1.6;">
+                  No. Pelajar: <strong>${data.studentId}</strong><br>
+                  Kursus: <strong>${data.program}</strong> (${data.semester})<br>
+                  Bidang AI: <strong>${data.aiInterest}</strong>
+                </div>
               </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 28px; background: linear-gradient(180deg, #292524 0%, #1c1917 100%); color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 800; border: 1px solid #44403c; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">Sahkan Kad Smartcard</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 4. Neo-Brutalism Pop
+function renderWelcomeNeoBrutalism(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background-color: #fef08a; font-family: 'Space Grotesk', -apple-system, sans-serif; color: #000000;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 3.5px solid #000000; box-shadow: 8px 8px 0px #000000; overflow: hidden;">
+          <tr>
+            <td style="padding: 24px 28px; background-color: #a7f3d0; border-bottom: 3.5px solid #000000;">
+              <span style="background-color: #fef08a; color: #000000; border: 2px solid #000000; padding: 3px 8px; font-weight: 900; font-size: 11px;">4. NEO-BRUTALIST // OFFICIAL</span>
+              <h1 style="margin: 10px 0 0; font-size: 24px; font-weight: 900; color: #000000; letter-spacing: -0.5px;">AISA UiTM KAMPUS JASIN</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 26px 28px;">
+              <h2 style="margin: 0 0 12px; font-size: 20px; font-weight: 900;">TAHNIAH, ${data.fullName.toUpperCase()}!</h2>
+              <div style="background-color: #fde047; border: 3px solid #000000; padding: 18px; box-shadow: 4px 4px 0px #000000; margin-bottom: 22px;">
+                <div style="font-size: 11px; font-weight: 900; font-family: monospace;">MEMBERSHIP NUMBER:</div>
+                <div style="font-size: 24px; font-weight: 900; font-family: monospace; margin: 4px 0 10px;">${data.membershipId}</div>
+                <div style="font-size: 12px; font-weight: 700; line-height: 1.6;">
+                  STUDENT ID: ${data.studentId}<br>
+                  PROGRAM: ${data.program}<br>
+                  AI SPECIALTY: ${data.aiInterest}
+                </div>
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 14px 30px; background-color: #000000; color: #fde047; text-decoration: none; font-weight: 900; font-size: 14px; border: 2px solid #000000; box-shadow: 4px 4px 0px #fde047;">MASUK PORTAL SEKARANG →</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 5. UiTM Royal Purple & Corporate Gold
+function renderWelcomeUiTmRoyal(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background-color: #faf5ff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1e1b4b;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1.5px solid #d8b4fe; border-radius: 18px; box-shadow: 0 12px 30px rgba(88, 28, 135, 0.08); overflow: hidden;">
+          <tr>
+            <td style="background-color: #3b0764; padding: 28px 30px; border-bottom: 4px solid #d97706; color: #ffffff;">
+              <span style="font-size: 10px; font-weight: 800; color: #fde047; letter-spacing: 1.5px;">UNIVERSITI TEKNOLOGI MARA • KAMPUS JASIN</span>
+              <h1 style="margin: 8px 0 2px; font-size: 20px; font-weight: 900; color: #ffffff;">ARTIFICIAL INTELLIGENCE STUDENT ASSOCIATION</h1>
+              <p style="margin: 0; font-size: 11px; color: #e9d5ff;">5. UiTM ROYAL PURPLE & GOLD // MEMORANDUM RASMI</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px 30px;">
+              <p style="margin: 0 0 18px; font-size: 14px; line-height: 1.6; color: #334155;">
+                Assalamualaikum WBT dan Salam Sejahtera,<br><br>
+                Sukacita dimaklumkan bahawa permohonan keahlian bagi <strong>${data.fullName}</strong> telah diperakukan secara rasmi.
+              </p>
+              <div style="background-color: #fbf7ee; border: 1.5px solid #d97706; border-radius: 14px; padding: 22px; margin-bottom: 24px;">
+                <table width="100%">
+                  <tr>
+                    <td><span style="font-size: 11px; color: #92400e; font-weight: 800;">ID KEAHLIAN RASMI UNIVERSITI</span><div style="font-size: 22px; font-weight: 900; color: #3b0764; font-family: monospace;">${data.membershipId}</div></td>
+                    <td align="right"><span style="background: #3b0764; color: #fde047; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800;">SAH 2026/2027</span></td>
+                  </tr>
+                </table>
+                <div style="border-top: 1px solid #fde68a; margin-top: 12px; padding-top: 12px; font-size: 12px; color: #451a03; line-height: 1.7;">
+                  Pelajar: <strong>${data.studentId}</strong><br>
+                  Fakulti/Kursus: <strong>${data.program}</strong> (${data.semester})<br>
+                  Minat Bidang: <strong>${data.aiInterest}</strong>
+                </div>
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 30px; background-color: #3b0764; color: #fde047; text-decoration: none; border-radius: 12px; font-size: 13px; font-weight: 800; border: 1.5px solid #d97706; box-shadow: 0 4px 14px rgba(59, 7, 100, 0.2);">Akses Portal Rasmi UiTM</a></div>
+            </td>
+          </tr>
+          <tr><td style="padding: 16px; background-color: #faf5ff; text-align: center; font-size: 11px; color: #7e22ce;">Kolej Pengajian Pengkomputeran, Informatik & Matematik (KPPIM) • FPA</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 6. Cyber Clean Titanium AI Lab
+function renderWelcomeCyberClean(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background-color: #f0fdfa; font-family: -apple-system, monospace, sans-serif; color: #0f172a;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 2px solid #06b6d4; border-radius: 16px; box-shadow: 0 15px 35px rgba(6, 182, 212, 0.12); overflow: hidden;">
+          <tr>
+            <td style="padding: 24px 28px; background: linear-gradient(90deg, #f0fdfa, #ccfbf1); border-bottom: 2px solid #06b6d4;">
+              <span style="font-size: 10px; font-weight: 800; color: #0891b2; letter-spacing: 1px;">6. CYBER TITANIUM // NODE ACTIVATION</span>
+              <h1 style="margin: 6px 0 0; font-size: 20px; font-weight: 900; color: #0f172a;">AISA NEURAL NETWORK ID</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 26px 28px;">
+              <p style="margin: 0 0 16px; font-size: 13px; color: #334155;">Identiti ejen mahasiswa aktif: <strong>${data.fullName}</strong></p>
+              <div style="background: #f8fafc; border: 1.5px solid #67e8f9; border-radius: 12px; padding: 18px; margin-bottom: 22px;">
+                <div style="font-size: 10px; color: #0891b2; font-weight: bold;">NODE ADDRESS // MEMBERSHIP ID:</div>
+                <div style="font-size: 22px; font-weight: 900; color: #0e7490; font-family: monospace; margin: 4px 0 10px;">${data.membershipId}</div>
+                <div style="font-size: 12px; color: #334155; line-height: 1.7; font-family: monospace;">
+                  [SYS_ID] : ${data.studentId}<br>
+                  [PROGRAM]: ${data.program}<br>
+                  [MODULE] : ${data.aiInterest}
+                </div>
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 28px; background-color: #0891b2; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 800; font-family: monospace;">ACCESS LAB WORKBENCH ⚡</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 7. Editorial Executive Monograph (Warm Ivory & Luxury Serif)
+function renderWelcomeEditorialSerif(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background-color: #fffdfa; font-family: Georgia, 'Times New Roman', serif; color: #1c1917;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e7e5e4; border-top: 5px solid #831843; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); overflow: hidden;">
+          <tr>
+            <td style="padding: 36px 36px 20px; border-bottom: 1px solid #f5f5f4; text-align: center;">
+              <span style="font-size: 10px; font-family: -apple-system, sans-serif; letter-spacing: 2px; color: #831843; font-weight: 800; text-transform: uppercase;">7. Editorial Monograph • Vol. MMXXVI</span>
+              <h1 style="margin: 12px 0 6px; font-size: 24px; font-weight: normal; color: #1c1917; font-style: italic;">The Artificial Intelligence Student Association</h1>
+              <p style="margin: 0; font-size: 12px; font-family: -apple-system, sans-serif; color: #78716c;">UiTM Cawangan Melaka Kampus Jasin</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 36px;">
+              <h2 style="margin: 0 0 12px; font-size: 18px; color: #1c1917; font-weight: normal;">Surat Pengesahan Keahlian: <em>${data.fullName}</em></h2>
+              <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.8; color: #44403c;">Dengan ini diperakui bahawa penama di atas telah diterima masuk sebagai ahli berdaftar AISA dengan rekod pengesahan seperti berikut:</p>
+              <div style="background-color: #fafaf9; border-left: 3px solid #831843; padding: 18px 22px; margin-bottom: 26px;">
+                <div style="font-family: -apple-system, sans-serif; font-size: 11px; color: #831843; font-weight: bold;">KOD DAFTAR KEAHLIAN</div>
+                <div style="font-size: 20px; font-weight: bold; color: #1c1917; font-family: monospace; margin: 4px 0 10px;">${data.membershipId}</div>
+                <div style="font-family: -apple-system, sans-serif; font-size: 12px; color: #57534e; line-height: 1.7;">
+                  Pelajar: ${data.studentId} • Program: ${data.program}<br>
+                  Bidang Kepakaran: ${data.aiInterest}
+                </div>
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 32px; background-color: #831843; color: #ffffff; text-decoration: none; border-radius: 4px; font-family: -apple-system, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;">Buka Arkib Rasmi</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 8. 3D Soft Claymorphism
+function renderWelcomeClaymorphism(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background: #f5f3ff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #1e1b4b;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background: #ffffff; border-radius: 32px; box-shadow: 12px 12px 24px #e0e7ff, -12px -12px 24px #ffffff; overflow: hidden; padding: 10px;">
+          <tr>
+            <td style="padding: 28px 24px 16px; text-align: center;">
+              <span style="background: #ede9fe; color: #6d28d9; padding: 6px 16px; border-radius: 30px; font-size: 11px; font-weight: 800;">8. 3D CLAY // PASTEL PASS</span>
+              <h1 style="margin: 14px 0 4px; font-size: 22px; font-weight: 900; color: #4338ca;">AISA DIGITAL ID</h1>
+              <p style="margin: 0; font-size: 12px; color: #6366f1;">UiTM Melaka Kampus Jasin</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 24px 28px;">
+              <div style="background: #eef2ff; border-radius: 24px; padding: 24px; box-shadow: inset 4px 4px 8px #c7d2fe, inset -4px -4px 8px #ffffff; margin-bottom: 24px; text-align: center;">
+                <div style="font-size: 11px; font-weight: 800; color: #4f46e5;">KAD KEAHLIAN COMEL & BERKUASA</div>
+                <div style="font-size: 24px; font-weight: 900; color: #312e81; font-family: monospace; margin: 8px 0 12px;">${data.membershipId}</div>
+                <div style="font-size: 13px; color: #3730a3; line-height: 1.6;">
+                  Ahli: <strong>${data.fullName}</strong> (${data.studentId})<br>
+                  Program: ${data.program}<br>
+                  Minat: <strong>${data.aiInterest}</strong>
+                </div>
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 14px 34px; background: #6366f1; color: #ffffff; text-decoration: none; border-radius: 20px; font-size: 13px; font-weight: 800; box-shadow: 4px 6px 12px rgba(99, 102, 241, 0.35);">Masuk Ke Portal</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 9. Perforated Summit Ticket Pass
+function renderWelcomeTicketPass(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background: #f8fafc; font-family: -apple-system, sans-serif; color: #0f172a;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background: #ffffff; border: 2px solid #cbd5e1; border-radius: 20px; box-shadow: 0 12px 28px rgba(0,0,0,0.06); overflow: hidden;">
+          <tr>
+            <td style="padding: 24px 28px; background: #2563eb; color: #ffffff;">
+              <table width="100%">
+                <tr>
+                  <td><span style="font-size: 10px; font-weight: 800; background: #1d4ed8; padding: 3px 8px; border-radius: 4px; font-family: monospace;">9. SUMMIT BOARDING PASS</span><h1 style="margin: 6px 0 0; font-size: 18px; font-weight: 900; color: #ffffff;">AISA AI SUMMIT & MEMBERSHIP</h1></td>
+                  <td align="right"><div style="font-size: 20px; font-weight: 900; font-family: monospace;">GATE A1</div></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Perforated Tear Line -->
+          <tr><td style="border-top: 2px dashed #94a3b8; background-color: #f1f5f9; height: 8px;"></td></tr>
+          <tr>
+            <td style="padding: 24px 28px;">
+              <table width="100%" style="margin-bottom: 20px;">
+                <tr>
+                  <td>
+                    <div style="font-size: 10px; color: #64748b; font-weight: bold;">NAMA PESERTA / AHLI:</div>
+                    <div style="font-size: 16px; font-weight: 800; color: #0f172a;">${data.fullName}</div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 4px;">ID: ${data.studentId} • ${data.program}</div>
+                  </td>
+                  <td align="right">
+                    <div style="font-size: 10px; color: #64748b; font-weight: bold;">ID PASS:</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #2563eb; font-family: monospace;">${data.membershipId}</div>
+                  </td>
+                </tr>
+              </table>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 11px; color: #475569; font-family: monospace; text-align: center; margin-bottom: 20px;">
+                ||| | ||||| || |||||| | |||| ||||| |||||||| | ||||| ||| [BARCODE VERIFIED]
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 28px; background: #2563eb; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 800;">Tunjuk Pas Semasa Masuk</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 10. Botanical Smart Agrotech AI (Mint & Emerald)
+function renderWelcomeEmeraldAgrotech(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background-color: #ecfdf5; font-family: -apple-system, sans-serif; color: #064e3b;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1.5px solid #a7f3d0; border-radius: 20px; box-shadow: 0 12px 30px rgba(5, 150, 105, 0.08); overflow: hidden;">
+          <tr>
+            <td style="padding: 28px 30px 18px; background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-bottom: 2px solid #34d399;">
+              <span style="background: #059669; color: #ffffff; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 800;">10. BOTANICAL AGROTECH AI // FPA & FSKM</span>
+              <h1 style="margin: 10px 0 2px; font-size: 21px; font-weight: 900; color: #065f46;">SMART CROP & AI INNOVATION</h1>
+              <p style="margin: 0; font-size: 12px; color: #047857;">UiTM Cawangan Melaka Kampus Jasin</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 26px 30px;">
+              <p style="margin: 0 0 16px; font-size: 14px; color: #064e3b;">Selamat menyertai ekosistem AI pintar pertanian & pengkomputeran, <strong>${data.fullName}</strong>:</p>
+              <div style="background: #f0fdf4; border: 1.5px solid #6ee7b7; border-radius: 14px; padding: 20px; margin-bottom: 22px;">
+                <div style="font-size: 10px; font-weight: 800; color: #047857; font-family: monospace;">AGRO-TECH MEMBERSHIP ID:</div>
+                <div style="font-size: 22px; font-weight: 900; color: #065f46; font-family: monospace; margin: 4px 0 10px;">${data.membershipId}</div>
+                <div style="font-size: 12px; color: #064e3b; line-height: 1.7;">
+                  Pelajar: <strong>${data.studentId}</strong><br>
+                  Program: ${data.program}<br>
+                  Fokus Inovasi: <strong style="color: #059669;">${data.aiInterest}</strong>
+                </div>
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 30px; background-color: #059669; color: #ffffff; text-decoration: none; border-radius: 12px; font-size: 13px; font-weight: 800; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);">Akses Projek Agrotech</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 11. Solar Sunset Mesh (Warm Peach & Coral)
+function renderWelcomeSunsetGradient(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fef2f2 100%); font-family: -apple-system, sans-serif; color: #431407;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1.5px solid #fed7aa; border-radius: 20px; box-shadow: 0 14px 35px rgba(234, 88, 12, 0.1); overflow: hidden;">
+          <tr>
+            <td style="padding: 28px 30px; background: linear-gradient(90deg, #ea580c, #db2777); color: #ffffff;">
+              <span style="font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.25); padding: 3px 8px; border-radius: 12px; font-family: monospace;">11. SOLAR SUNSET MESH</span>
+              <h1 style="margin: 8px 0 2px; font-size: 21px; font-weight: 900; color: #ffffff;">AISA INNOVATOR PASS</h1>
+              <p style="margin: 0; font-size: 12px; color: #ffedd5;">UiTM Cawangan Melaka Kampus Jasin</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px 30px;">
+              <p style="margin: 0 0 16px; font-size: 14px; color: #431407;">Selamat datang ke komuniti pemula AI terkemuka, <strong>${data.fullName}</strong>!</p>
+              <div style="background: #fff7ed; border: 1.5px solid #fdba74; border-radius: 14px; padding: 20px; margin-bottom: 22px;">
+                <div style="font-size: 10px; font-weight: 800; color: #c2410c; font-family: monospace;">MEMBERSHIP TOKEN:</div>
+                <div style="font-size: 24px; font-weight: 900; color: #ea580c; font-family: monospace; margin: 4px 0 10px;">${data.membershipId}</div>
+                <div style="font-size: 12px; color: #7c2d12; line-height: 1.7;">
+                  ID: <strong>${data.studentId}</strong> • ${data.program}<br>
+                  Bidang AI: <strong>${data.aiInterest}</strong>
+                </div>
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 13px 32px; background: linear-gradient(90deg, #ea580c, #db2777); color: #ffffff; text-decoration: none; border-radius: 12px; font-size: 13px; font-weight: 800; box-shadow: 0 6px 18px rgba(234, 88, 12, 0.25);">Buka Pas Innovator</a></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// 12. Paper Terminal Data Matrix (Amber/Green ASCII)
+function renderWelcomeRetroTerminal(data: WelcomeEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background-color: #fcfbf7; font-family: 'Courier New', Courier, monospace; color: #14532d;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 2px solid #86efac; border-radius: 8px; box-shadow: 0 8px 24px rgba(22, 101, 52, 0.08); overflow: hidden;">
+          <tr>
+            <td style="padding: 20px 24px; background-color: #f0fdf4; border-bottom: 2px dashed #86efac;">
+              <div style="font-size: 10px; color: #16a34a; font-weight: bold;">[SYS_INIT] 12. PAPER TERMINAL // AISA MATRIX 2026</div>
+              <h1 style="margin: 4px 0 0; font-size: 18px; font-weight: bold; color: #14532d;">>>> AUTH_RECORD_CONFIRMED</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px;">
+              <pre style="margin: 0 0 16px; font-size: 12px; color: #166534; line-height: 1.6;">
++------------------------------------------------+
+| USER : ${data.fullName}
+| ID   : ${data.studentId}
+| PASS : ${data.membershipId}
+| PROG : ${data.program}
+| DEPT : FSKM & FPA UITM JASIN
++------------------------------------------------+
+              </pre>
+              <div style="font-size: 12px; color: #14532d; line-height: 1.6; margin-bottom: 20px;">
+                Permohonan anda telah didaftarkan dalam matriks pengkalan data AISA. Sila simpan nombor pas ini untuk log masuk ke stesen kerja.
+              </div>
+              <div style="text-align: center;"><a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 10px 24px; background-color: #15803d; color: #ffffff; text-decoration: none; font-size: 12px; font-weight: bold; border-radius: 4px;">[ EXECUTE: PORTAL_ACCESS ]</a></div>
             </td>
           </tr>
         </table>
@@ -707,9 +662,10 @@ export function renderSubscriberEmailHtml(data: { email: string; topic: string }
 }
 
 // -------------------------------------------------------------
-// 3. EXCO BROADCAST CAMPAIGN TEMPLATES (6 DISTINCT STYLES)
+// BROADCAST CAMPAIGN BUILDER (12 LIGHT STYLES & GOOGLE CALENDAR)
 // -------------------------------------------------------------
-export function renderBroadcastCampaignEmailHtml(campaign: {
+
+export interface BroadcastEmailData {
   title: string;
   subject: string;
   content: string;
@@ -719,190 +675,152 @@ export function renderBroadcastCampaignEmailHtml(campaign: {
   templateStyle?: EmailDesignStyle;
   senderRole?: string;
   senderName?: string;
-}): string {
+}
+
+export function renderBroadcastCampaignEmailHtml(campaign: BroadcastEmailData): string {
   const style = campaign.templateStyle || 'minimalist';
+  
+  // Google Calendar URL generator
+  const cleanDate = (campaign.date || '').replace(/-/g, '');
+  const cleanTime = (campaign.time || '09:00').replace(/:/g, '') + '00';
+  const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(campaign.title)}&dates=${cleanDate}T${cleanTime}/${cleanDate}T${cleanTime}&details=${encodeURIComponent(campaign.content)}&location=${encodeURIComponent(campaign.location || 'UiTM Melaka Kampus Jasin')}`;
 
-  // UiTM Royal
-  if (style === 'uitm_royal') {
-    return `<!DOCTYPE html>
-<html>
-<body style="background-color: #faf5ff; font-family: Georgia, serif; color: #1e1b4b; padding: 30px 15px;">
-  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 2px solid #581c87; padding: 32px; border-radius: 8px; box-shadow: 0 4px 15px rgba(88,28,135,0.08);">
-    <div style="text-align: center; border-bottom: 3px solid #d97706; padding-bottom: 14px; margin-bottom: 22px;">
-      <h2 style="margin: 0; color: #3b0764; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;">UNIVERSITI TEKNOLOGI MARA CAWANGAN MELAKA KAMPUS JASIN</h2>
-      <h3 style="margin: 4px 0 0; color: #7c3aed; font-size: 13px;">ARTIFICIAL INTELLIGENCE STUDENT ASSOCIATION (AISA)</h3>
-      <p style="margin: 4px 0 0; font-size: 10px; color: #64748b;">Rujukan: AISA/UiTM/2026/MEMO-${Date.now().toString().slice(-4)}</p>
-    </div>
-
-    <h3 style="font-size: 16px; color: #3b0764; border-left: 4px solid #d97706; padding-left: 12px; margin-bottom: 16px;">
-      ${campaign.title}
-    </h3>
-
-    <div style="font-size: 13px; line-height: 1.8; color: #334155; margin-bottom: 20px;">
-      ${campaign.content.replace(/\n/g, '<br/>')}
-    </div>
-
-    ${campaign.date ? `
-    <div style="background-color: #faf5ff; border: 1.5px solid #d8b4fe; padding: 14px 18px; border-radius: 6px; font-size: 12px; margin-bottom: 22px;">
-      <strong>Tarikh:</strong> ${campaign.date} | <strong>Masa:</strong> ${campaign.time || '8:30 PM'} | <strong>Tempat:</strong> ${campaign.location || 'Dewan Al-Khawarizmi / GMeet'}
-    </div>
-    ` : ''}
-
-    <div style="margin-top: 25px; font-size: 12px; border-top: 1px solid #f3e8ff; padding-top: 15px;">
-      <p style="margin: 0; font-weight: bold; color: #3b0764;">"USAHA, TAKWA, MULIA"</p>
-      <p style="margin: 10px 0 0; color: #475569;">Yang Menjalankan Amanah,</p>
-      <p style="margin: 4px 0 0; font-weight: bold; color: #1e1b4b;">${campaign.senderName || 'Barisan Majlis Tertinggi AISA'}</p>
-      <p style="margin: 0; color: #6b21a8;">${campaign.senderRole || 'AISA UiTM Melaka Kampus Jasin'}</p>
-    </div>
-  </div>
-</body>
-</html>`;
-  }
-
-  // Neo-Brutalism
-  if (style === 'neobrutalism') {
-    return `<!DOCTYPE html>
-<html>
-<body style="background-color: #fef08a; font-family: 'Courier New', Courier, monospace; color: #000000; padding: 30px 15px;">
-  <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border: 3px solid #000000; box-shadow: 7px 7px 0px #000000; border-radius: 10px; overflow: hidden;">
-    <div style="background: #000000; color: #facc15; padding: 20px; text-align: center; border-bottom: 3px solid #000000;">
-      <div style="font-size: 11px; font-weight: 900; background: #38bdf8; color: #000000; display: inline-block; padding: 2px 8px; border: 2px solid #000000;">OFFICIAL BROADCAST</div>
-      <h1 style="margin: 8px 0 0; font-size: 20px; font-weight: 900;">AISA // NOTIS HEBAHAN</h1>
-    </div>
-    <div style="padding: 24px;">
-      <h2 style="font-size: 17px; margin: 0 0 14px; font-weight: 900;">${campaign.title}</h2>
-      <div style="font-size: 13px; line-height: 1.7; color: #000000; margin-bottom: 20px;">
-        ${campaign.content.replace(/\n/g, '<br/>')}
-      </div>
-      ${campaign.date ? `
-      <div style="background: #e0f2fe; border: 2px solid #000000; box-shadow: 4px 4px 0px #000000; padding: 12px 14px; font-size: 12px; font-weight: bold; margin-bottom: 20px;">
-        JADUAL: ${campaign.date} (${campaign.time || ''}) @ ${campaign.location || 'Kampus Jasin / Online'}
-      </div>
-      ` : ''}
-      <div style="border-top: 2px solid #000000; padding-top: 14px; font-size: 11px;">
-        DIHANTAR OLEH: <strong>${campaign.senderRole || 'EXCO AISA'}</strong>
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
-  }
-
-  // Skeuomorphism (Tactile Lanyard Memo)
-  if (style === 'skeuomorphism') {
-    return `<!DOCTYPE html>
-<html>
-<body style="background-color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; padding: 35px 15px;">
-  <div style="max-width: 560px; margin: 0 auto; background: #ffffff; border: 1px solid #cbd5e1; border-bottom: 4px solid #64748b; border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.14); overflow: hidden;">
-    <div style="background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%); padding: 22px; text-align: center; color: #ffffff; border-bottom: 3px solid #f59e0b;">
-      <span style="font-size: 10px; letter-spacing: 2px; color: #fde68a; font-weight: 800;">AISA OFFICIAL BULLETIN</span>
-      <h2 style="margin: 4px 0 0; font-size: 19px; font-weight: 900;">${campaign.title}</h2>
-    </div>
-    <div style="padding: 26px;">
-      <div style="font-size: 14px; line-height: 1.7; color: #334155; margin-bottom: 20px;">
-        ${campaign.content.replace(/\n/g, '<br/>')}
-      </div>
-      ${campaign.date ? `
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #4338ca; padding: 14px; border-radius: 8px; font-size: 12px; margin-bottom: 20px;">
-        <strong style="color: #4338ca;">📅 Tarikh:</strong> ${campaign.date} | <strong>⏰ Masa:</strong> ${campaign.time || '8:30 PM'}<br>
-        <strong>📍 Tempat:</strong> ${campaign.location || 'Dewan Al-Khawarizmi & Online'}
-      </div>
-      ` : ''}
-      <div style="height: 10px; background: linear-gradient(90deg, #ec4899, #8b5cf6, #06b6d4, #10b981, #f59e0b, #ec4899); border-radius: 4px; opacity: 0.8; margin-bottom: 15px;"></div>
-      <p style="margin: 0; font-size: 11px; color: #64748b; text-align: center;">
-        Dihantar oleh: ${campaign.senderRole || 'Barisan Majlis Tertinggi AISA'} • UiTM Melaka Kampus Jasin
-      </p>
-    </div>
-  </div>
-</body>
-</html>`;
-  }
-
-  // Glassmorphism (Frosted Glass Cyber)
-  if (style === 'glassmorphism') {
-    return `<!DOCTYPE html>
-<html>
-<body style="background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%); font-family: -apple-system, sans-serif; color: #0f172a; padding: 30px 15px;">
-  <div style="max-width: 580px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border: 2px solid #c7d2fe; border-radius: 20px; box-shadow: 0 15px 35px rgba(99, 102, 241, 0.12); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%); padding: 26px; text-align: center; color: #ffffff;">
-      <span style="font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.25); padding: 3px 10px; border-radius: 12px; letter-spacing: 1px;">HEBAHAN RASMI AISA</span>
-      <h1 style="margin: 8px 0 0; font-size: 20px; font-weight: 900;">${campaign.title}</h1>
-    </div>
-    <div style="padding: 26px;">
-      <div style="font-size: 14px; line-height: 1.7; color: #334155; margin-bottom: 20px;">
-        ${campaign.content.replace(/\n/g, '<br/>')}
-      </div>
-      ${campaign.date ? `
-      <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ecfeff 100%); border: 1.5px solid #a5b4fc; border-radius: 12px; padding: 14px; font-size: 12px; margin-bottom: 20px; color: #1e1b4b;">
-        <strong>📅 Tarikh:</strong> ${campaign.date} | <strong>⏰ Masa:</strong> ${campaign.time || '8:30 PM'}<br>
-        <strong>📍 Tempat:</strong> ${campaign.location || 'Dewan Seminar / GMeet'}
-      </div>
-      ` : ''}
-      <p style="margin: 0; font-size: 11px; color: #64748b; text-align: center;">
-        AISA UiTM Melaka Kampus Jasin // ${campaign.senderRole || 'Biro Penerbitan & Publisiti'}
-      </p>
-    </div>
-  </div>
-</body>
-</html>`;
-  }
-
-  // Cyber Clean Titanium
-  if (style === 'cyber_clean') {
-    return `<!DOCTYPE html>
-<html>
-<body style="background-color: #f1f5f9; font-family: -apple-system, sans-serif; color: #0f172a; padding: 30px 15px;">
-  <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border: 1.5px solid #0284c7; border-radius: 16px; box-shadow: 0 15px 35px rgba(2, 132, 199, 0.1); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #0f172a 0%, #0369a1 100%); padding: 24px; text-align: center; color: #ffffff;">
-      <div style="height: 3px; background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8); margin-bottom: 10px; border-radius: 2px;"></div>
-      <span style="font-size: 10px; font-weight: 800; color: #38bdf8; letter-spacing: 1.5px;">AISA // RESEARCH LAB NOTIFICATION</span>
-      <h1 style="margin: 6px 0 0; font-size: 19px; font-weight: 900;">${campaign.title}</h1>
-    </div>
-    <div style="padding: 26px;">
-      <div style="font-size: 14px; line-height: 1.7; color: #334155; margin-bottom: 20px;">
-        ${campaign.content.replace(/\n/g, '<br/>')}
-      </div>
-      ${campaign.date ? `
-      <div style="background: #f8fafc; border: 1px solid #bae6fd; border-radius: 10px; padding: 14px; font-size: 12px; margin-bottom: 20px; color: #0f172a;">
-        <strong style="color: #0284c7;">Jadual:</strong> ${campaign.date} (${campaign.time || '10:00 AM'})<br>
-        <strong style="color: #0284c7;">Lokasi:</strong> ${campaign.location || 'Dewan Al-Khawarizmi / Online'}
-      </div>
-      ` : ''}
-      <p style="margin: 0; font-size: 11px; color: #64748b; text-align: center;">
-        AISA UiTM Melaka Kampus Jasin // ${campaign.senderRole || 'Biro Akademik & Teknikal AI'}
-      </p>
-    </div>
-  </div>
-</body>
-</html>`;
-  }
-
-  // Default: Minimalist Academic
   return `<!DOCTYPE html>
 <html>
-<body style="background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; padding: 30px 15px;">
-  <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); overflow: hidden;">
-    <div style="height: 5px; background: linear-gradient(90deg, #4f46e5, #06b6d4);"></div>
-    <div style="padding: 28px 28px 20px; border-bottom: 1px solid #f1f5f9;">
-      <span style="font-size: 11px; font-weight: 700; color: #0369a1; background: #e0f2fe; padding: 3px 10px; border-radius: 20px;">HEBAHAN PERSATUAN</span>
-      <h1 style="margin: 10px 0 0; font-size: 19px; font-weight: 800; color: #0f172a;">${campaign.title}</h1>
-      <p style="margin: 4px 0 0; font-size: 12px; color: #64748b;">AISA UiTM Melaka Kampus Jasin • FSKM & FPA</p>
-    </div>
-    <div style="padding: 24px 28px;">
-      <div style="font-size: 14px; line-height: 1.7; color: #334155; margin-bottom: 20px;">
-        ${campaign.content.replace(/\n/g, '<br/>')}
-      </div>
-      ${campaign.date ? `
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; font-size: 12px; margin-bottom: 20px; color: #0f172a;">
-        <strong>📅 Tarikh:</strong> ${campaign.date} | <strong>⏰ Masa:</strong> ${campaign.time || '8:30 PM'}<br>
-        <strong>📍 Tempat:</strong> ${campaign.location || 'Dewan Seminar / GMeet'}
-      </div>
-      ` : ''}
-      <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; font-size: 12px; color: #64748b;">
-        Dihantar oleh: <strong style="color: #0f172a;">${campaign.senderName || 'Barisan Exco AISA'}</strong> (${campaign.senderRole || 'AISA UiTM Jasin'})
-      </div>
-    </div>
-  </div>
+<head>
+  <meta charset="utf-8">
+  <title>${campaign.title}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 30px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); overflow: hidden;">
+          <!-- Top Accent Bar -->
+          <tr><td style="height: 6px; background: linear-gradient(90deg, #4f46e5, #06b6d4, #d97706);"></td></tr>
+          
+          <!-- Header Banner -->
+          <tr>
+            <td style="padding: 28px 28px 20px; border-bottom: 1px solid #f1f5f9;">
+              <span style="font-size: 11px; font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 3px 10px; border-radius: 12px; font-family: monospace;">AISA HEBAHAN // ${style.toUpperCase()}</span>
+              <h1 style="margin: 10px 0 4px; font-size: 20px; font-weight: 900; color: #0f172a;">${campaign.title}</h1>
+              <p style="margin: 0; font-size: 12px; color: #64748b;">UiTM Cawangan Melaka Kampus Jasin • FSKM & FPA</p>
+            </td>
+          </tr>
+
+          <!-- Main Body -->
+          <tr>
+            <td style="padding: 26px 28px;">
+              <div style="font-size: 14px; line-height: 1.7; color: #334155; margin-bottom: 22px;">
+                ${campaign.content.replace(/\n/g, '<br/>')}
+              </div>
+
+              ${campaign.date ? `
+              <!-- Event Logistics Card -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 18px; margin-bottom: 22px;">
+                <tr>
+                  <td>
+                    <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">📅 Jadual & Tarikh:</div>
+                    <div style="font-size: 14px; color: #0284c7; font-weight: 800; font-family: monospace;">${campaign.date} (${campaign.time || '8:30 PM'})</div>
+                    <div style="font-size: 12px; color: #475569; margin-top: 8px;">📍 Tempat: <strong>${campaign.location || 'Dewan Seminar / Google Meet'}</strong></div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Google Calendar RSVP Button -->
+              <div style="text-align: center; margin-bottom: 24px;">
+                <a href="${gCalUrl}" target="_blank" style="display: inline-block; padding: 11px 24px; background-color: #0284c7; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 12px; font-weight: 800; margin-right: 8px;">
+                  📅 Tambah ke Google Calendar
+                </a>
+                <a href="https://aisa-web-c40.pages.dev" target="_blank" style="display: inline-block; padding: 11px 24px; background-color: #0f172a; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 12px; font-weight: 800;">
+                  Portal Web AISA →
+                </a>
+              </div>
+              ` : `
+              <div style="text-align: center; margin-bottom: 20px;">
+                <a href="https://aisa-web-c40.pages.dev" target="_blank" style="display: inline-block; padding: 12px 28px; background-color: #0f172a; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 800;">
+                  Buka Portal Web AISA →
+                </a>
+              </div>
+              `}
+
+              <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; font-size: 12px; color: #64748b;">
+                Dikeluarkan oleh: <strong style="color: #0f172a;">${campaign.senderName || 'Barisan Exco AISA'}</strong> (${campaign.senderRole || 'AISA UiTM Jasin'})
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 16px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center; font-size: 11px; color: #94a3b8;">
+              Emel ini dihantar secara rasmi daripada Sistem Penyiaran AISA UiTM Kampus Jasin.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// -------------------------------------------------------------
+// SUBSCRIBER CONFIRMATION EMAIL BUILDER
+// -------------------------------------------------------------
+
+export interface SubscriberEmailData {
+  email: string;
+  topic: string;
+}
+
+export function renderSubscriberEmailHtml(data: SubscriberEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 35px 15px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); overflow: hidden;">
+          <tr><td style="height: 6px; background: linear-gradient(90deg, #0284c7, #4f46e5);"></td></tr>
+          <tr>
+            <td style="padding: 30px 28px 20px; border-bottom: 1px solid #f1f5f9;">
+              <span style="font-size: 11px; font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 3px 10px; border-radius: 12px; font-family: monospace;">PENGESAHAN LANGGANAN NOTIS RASMI</span>
+              <h1 style="margin: 10px 0 4px; font-size: 20px; font-weight: 900; color: #0f172a;">AISA NOTIS & HEBAHAN</h1>
+              <p style="margin: 0; font-size: 12px; color: #64748b;">UiTM Cawangan Melaka Kampus Jasin</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 26px 28px;">
+              <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: #334155;">
+                Terima kasih kerana melanggan buletin dan notis rasmi Artificial Intelligence Student Association (AISA) UiTM Melaka Kampus Jasin.
+              </p>
+              <div style="background-color: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 18px; margin-bottom: 22px;">
+                <div style="font-size: 11px; font-weight: 800; color: #166534; font-family: monospace;">BUTIRAN LANGGANAN:</div>
+                <div style="font-size: 13px; color: #14532d; margin-top: 6px; line-height: 1.7;">
+                  Emel: <strong>${data.email}</strong><br>
+                  Topik Pilihan: <strong style="color: #0284c7;">${data.topic}</strong><br>
+                  Status: <strong style="color: #16a34a;">Aktif ✓</strong>
+                </div>
+              </div>
+              <p style="margin: 0 0 20px; font-size: 13px; color: #64748b; line-height: 1.6;">
+                Anda akan menerima hebahan terus ke peti masuk sebaik sahaja aktiviti, bengkel, hackathon, atau notis berkaitan diterbitkan oleh Exco AISA.
+              </p>
+              <div style="text-align: center;">
+                <a href="https://aisa-web-c40.pages.dev" style="display: inline-block; padding: 12px 28px; background-color: #0f172a; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 800;">
+                  Buka Portal Web AISA →
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 16px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center; font-size: 11px; color: #94a3b8;">
+              AISA UiTM Cawangan Melaka Kampus Jasin • FSKM & FPA
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`;
 }
