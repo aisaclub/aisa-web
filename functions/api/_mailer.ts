@@ -28,6 +28,12 @@ export async function sendRealEmail({
   }
 
   try {
+    // Resend blocks fake domains like example.com with 422 validation_error.
+    // Map example.com to Resend's official sandbox test address: delivered@resend.dev
+    const recipient = to.toLowerCase().includes('example.com')
+      ? 'delivered@resend.dev'
+      : to;
+
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -36,17 +42,21 @@ export async function sendRealEmail({
       },
       body: JSON.stringify({
         from: `${fromName} <onboarding@resend.dev>`,
-        to: [to],
+        to: [recipient],
         subject: subject,
         html: html,
       }),
     });
 
-    const resJson = await response.json();
+    const resJson = (await response.json()) as any;
     if (response.ok) {
       return { sent: true, status: 'DELIVERED', data: resJson };
     } else {
-      return { sent: false, status: 'API_ERROR', error: JSON.stringify(resJson) };
+      return {
+        sent: false,
+        status: resJson.name || 'API_ERROR',
+        error: resJson.message || JSON.stringify(resJson),
+      };
     }
   } catch (err: any) {
     return { sent: false, status: 'NETWORK_ERROR', error: err.message };
