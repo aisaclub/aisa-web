@@ -35,14 +35,32 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
 
     // If D1 is available, fetch real emails based on target audience
     const db = context.env.DB || (context.env as any)['context.env.DB'];
-    if (db) {
+    let emailsToSend: string[] = [];
+
+    if (campaign.customRecipients && Array.isArray(campaign.customRecipients) && campaign.customRecipients.length > 0) {
+      emailsToSend.push(...campaign.customRecipients);
+    } else if (db) {
       const target = campaign.targetAudience || 'all';
-      let emailsToSend: string[] = [];
 
       if (target === 'subscribers' || target === 'all') {
-        const { results: subResults } = await db.prepare('SELECT email FROM notice_subscribers').all();
-        if (subResults) {
-          emailsToSend.push(...subResults.map((r: any) => r.email));
+        try {
+          const { results: subResults } = await db.prepare('SELECT email, preferred_topic FROM notice_subscribers').all();
+          if (subResults) {
+            const cat = (campaign.category || campaign.eventCategory || '').toLowerCase();
+            const filteredSubs = subResults.filter((r: any) => {
+              const pref = (r.preferred_topic || '').toLowerCase();
+              if (!cat || pref.includes('semua') || pref === '') return true;
+              if (cat.includes('pertandingan') || cat.includes('hackathon')) return pref.includes('pertandingan');
+              if (cat.includes('bengkel') || cat.includes('workshop')) return pref.includes('bengkel');
+              if (cat.includes('promosi') || cat.includes('notis')) return pref.includes('notis') || pref.includes('promosi');
+              return true;
+            });
+            emailsToSend.push(...filteredSubs.map((r: any) => r.email));
+          }
+        } catch {
+          // fallback to simple select if preferred_topic column not present
+          const { results: fallbackSubs } = await db.prepare('SELECT email FROM notice_subscribers').all();
+          if (fallbackSubs) emailsToSend.push(...fallbackSubs.map((r: any) => r.email));
         }
       }
 
@@ -52,13 +70,10 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
           emailsToSend.push(...regResults.map((r: any) => r.email));
         }
       }
+    }
 
-      if (campaign.customRecipients && Array.isArray(campaign.customRecipients)) {
-        emailsToSend.push(...campaign.customRecipients);
-      }
-
-      // Deduplicate emails
-      const uniqueEmails = Array.from(new Set(emailsToSend));
+    // Deduplicate emails
+    const uniqueEmails = Array.from(new Set(emailsToSend.filter((e) => typeof e === 'string' && e.includes('@'))));
 
       const hasMailer = context.env.RESEND_API_KEY || (context.env as any).GMAIL_RELAY_URL;
       if (hasMailer && uniqueEmails.length > 0) {

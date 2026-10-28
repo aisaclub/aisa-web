@@ -150,6 +150,15 @@ export function App() {
     );
   };
 
+  const handleDeleteRegistration = async (id: string) => {
+    setRegistrations((prev) => prev.filter((r) => r.id !== id));
+    try {
+      await fetch(`/api/register?id=${id}`, { method: 'DELETE' });
+    } catch {
+      // Handled silently
+    }
+  };
+
   const handleResetData = () => {
     setMembers(initialMembers);
     setAdvisors(initialAdvisors);
@@ -302,6 +311,7 @@ export function App() {
         onTriggerEmailToMember={handleTriggerEmailFromAdmin}
         onOpenEmailStudio={() => setIsEmailStudioOpen(true)}
         onUpdateRegStatus={handleUpdateRegStatus}
+        onDeleteRegistration={handleDeleteRegistration}
         initialEditMember={editTargetMember}
       />
 

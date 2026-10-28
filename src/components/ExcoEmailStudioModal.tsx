@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CustomEmailCampaign, ClubRegistration, NoticeSubscriber, EmailDesignStyle } from '../types';
-import { X, Send, Eye, Palette, Calendar, MapPin, Clock, Check, Sparkles, Copy, Users, FileText, Layers, ShieldCheck, QrCode, Cpu } from 'lucide-react';
+import { X, Send, Eye, Palette, Calendar, MapPin, Clock, Check, Sparkles, Copy, Users, FileText, Layers, ShieldCheck, QrCode, Cpu, CheckSquare, Square, Search, Filter } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ExcoEmailStudioModalProps {
@@ -25,8 +25,8 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
     subject: '[AISA UiTM Jasin] Notis Rasmi Perjumpaan Ahli & Bengkel Model AI Sesi 1',
     templateStyle: 'minimalist',
     senderRole: 'Setiausaha Kehormat AISA (Biro Pentadbiran)',
-    eventDate: 'Jumaat, 14 November 2026',
-    eventTime: '8:30 PM - 10:30 PM',
+    eventDate: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+    eventTime: '20:30',
     location: 'Dewan Seminar Al-Khawarizmi, FSKM Jasin & Google Meet',
     agendaItems: [
       'Amanat Khas Pensyarah Penasihat (Dr. Ahmad Faizal)',
@@ -40,12 +40,43 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
   });
 
   const [newAgendaInput, setNewAgendaInput] = useState('');
-  const [targetGroup, setTargetGroup] = useState<'all_members' | 'all_subscribers' | 'custom'>('all_members');
+  
+  // Target Audience Mode:
+  // 'all' = Semua (Ahli + Pelanggan)
+  // 'all_members' = Ahli Berdaftar Sahaja
+  // 'all_subscribers' = Pelanggan Notis Sahaja
+  // 'select_custom' = Pilih Penerima Tertentu (Checkbox Select)
+  const [targetGroup, setTargetGroup] = useState<'all' | 'all_members' | 'all_subscribers' | 'select_custom'>('all');
+  
+  // Selected Recipient Emails for Checkbox Select
+  const [selectedRecipientEmails, setSelectedRecipientEmails] = useState<string[]>(() => {
+    return [...registrations.map((r) => r.email), ...subscribers.map((s) => s.email)];
+  });
+  const [recipientSearch, setRecipientSearch] = useState('');
+
+  // Topik Kategori Hebahan (Untuk Penapisan Pelanggan Notis)
+  const [campaignCategory, setCampaignCategory] = useState<string>('Semua Hebahan & Mesyuarat');
+
   const [sentSuccess, setSentSuccess] = useState(false);
   const [copiedHtml, setCopiedHtml] = useState(false);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
 
   if (!isOpen) return null;
+
+  // Toggle recipient checkbox
+  const handleToggleRecipient = (email: string) => {
+    setSelectedRecipientEmails((prev) =>
+      prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email]
+    );
+  };
+
+  const handleSelectAllRecipients = () => {
+    setSelectedRecipientEmails([...registrations.map((r) => r.email), ...subscribers.map((s) => s.email)]);
+  };
+
+  const handleDeselectAllRecipients = () => {
+    setSelectedRecipientEmails([]);
+  };
 
   const handleAddAgenda = () => {
     if (!newAgendaInput.trim()) return;
@@ -63,13 +94,39 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
     });
   };
 
+  // Determine recipient count for display
+  const getCalculatedRecipientCount = () => {
+    if (targetGroup === 'select_custom') {
+      return selectedRecipientEmails.length;
+    }
+    if (targetGroup === 'all_members') {
+      return registrations.length;
+    }
+    if (targetGroup === 'all_subscribers') {
+      // Filter subscribers by campaignCategory
+      if (campaignCategory === 'Semua Hebahan & Mesyuarat') {
+        return subscribers.length;
+      }
+      return subscribers.filter(
+        (s) => s.preferredTopic === campaignCategory || s.preferredTopic === 'Semua Hebahan & Mesyuarat'
+      ).length;
+    }
+    // 'all'
+    const matchingSubs = subscribers.filter(
+      (s) => campaignCategory === 'Semua Hebahan & Mesyuarat' || s.preferredTopic === campaignCategory || s.preferredTopic === 'Semua Hebahan & Mesyuarat'
+    ).length;
+    return registrations.length + matchingSubs;
+  };
+
   const handleSendCampaign = async () => {
     setIsBroadcasting(true);
+    const calculatedCount = getCalculatedRecipientCount();
+
     const finalCampaign: CustomEmailCampaign = {
       ...campaign,
       id: `camp-${Date.now()}`,
       sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      recipientCount: targetGroup === 'all_members' ? registrations.length : subscribers.length,
+      recipientCount: calculatedCount,
     };
 
     try {
@@ -85,7 +142,9 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
           eventLocation: campaign.location,
           templateStyle: campaign.templateStyle,
           senderRole: campaign.senderRole,
-          targetAudience: targetGroup === 'all_members' ? 'members' : 'subscribers',
+          category: campaignCategory,
+          targetAudience: targetGroup === 'select_custom' ? 'custom' : targetGroup === 'all_members' ? 'members' : targetGroup === 'all_subscribers' ? 'subscribers' : 'all',
+          customRecipients: targetGroup === 'select_custom' ? selectedRecipientEmails : undefined,
         }),
       });
     } catch {
@@ -115,6 +174,30 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
     setTimeout(() => setCopiedHtml(false), 2500);
   };
 
+  // Filtered recipient list for 'select_custom'
+  const allAvailableRecipients = [
+    ...registrations.map((r) => ({
+      email: r.email,
+      name: r.fullName,
+      detail: `${r.studentId} • ${r.program}`,
+      type: 'Ahli Berdaftar' as const,
+    })),
+    ...subscribers.map((s) => ({
+      email: s.email,
+      name: s.email.split('@')[0],
+      detail: `Langganan: ${s.preferredTopic}`,
+      type: 'Pelanggan Notis' as const,
+    })),
+  ].filter((item) => {
+    if (!recipientSearch.trim()) return true;
+    const q = recipientSearch.toLowerCase();
+    return (
+      item.name.toLowerCase().includes(q) ||
+      item.email.toLowerCase().includes(q) ||
+      item.detail.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md animate-fadeIn">
       <div className="relative w-full max-w-6xl max-h-[92vh] bg-slate-900 border border-indigo-500/30 rounded-3xl p-6 shadow-2xl flex flex-col overflow-hidden">
@@ -126,10 +209,10 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
             </span>
             <div>
               <h3 className="text-base font-bold text-white font-space">
-                KONSOL PENGGUBAL EMEL EXCO (6 GAYA TEMA CERAH & MODEN)
+                KONSOL PENGGUBAL EMEL EXCO (6 GAYA TEMA CERAH & PILIHAN PENERIMA)
               </h3>
               <p className="text-xs text-slate-400">
-                Pilih antara 6 gaya reka bentuk emel berkualiti tinggi yang cerah, kemas, dan mudah dibaca di Gmail/Outlook.
+                Pilih tema cerah kontras tinggi, tetapkan tarikh/masa via date picker, dan pilih sasaran penerima (Semua / Pilihan).
               </p>
             </div>
           </div>
@@ -147,7 +230,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
           <div className="mt-3 p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs font-mono-code font-bold flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Check className="w-4 h-4" />
-              <span>Emel "{campaign.title}" berjaya dihantar kepada {campaign.recipientCount || registrations.length} penerima via Google Relay / Edge!</span>
+              <span>Emel "{campaign.title}" berjaya dihantar kepada {getCalculatedRecipientCount()} penerima via Google Relay / Edge!</span>
             </span>
             <span className="text-[10px] bg-emerald-500/30 px-2 py-0.5 rounded">STATUS: DELIVERED</span>
           </div>
@@ -160,7 +243,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
             {/* Design Style Selector (6 Options) */}
             <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800">
               <label className="text-xs font-bold text-slate-300 block mb-2 font-mono-code">
-                1. PILIH TEMA REKA BENTUK EMEL (6 PILIHAN):
+                1. PILIH TEMA REKA BENTUK EMEL (6 PILIHAN CERAH):
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {/* 1. Minimalist */}
@@ -183,7 +266,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
                   onClick={() => setCampaign({ ...campaign, templateStyle: 'glassmorphism' })}
                   className={`p-2.5 rounded-xl border text-left transition-all ${
                     campaign.templateStyle === 'glassmorphism'
-                      ? 'bg-cyan-950/70 border-cyan-400 text-cyan-300 shadow-lg shadow-cyan-950/40 ring-2 ring-cyan-500/30 font-bold'
+                      ? 'bg-cyan-950/70 border-cyan-400 text-cyan-300 shadow-lg ring-2 ring-cyan-500/30 font-bold'
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
@@ -197,7 +280,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
                   onClick={() => setCampaign({ ...campaign, templateStyle: 'skeuomorphism' })}
                   className={`p-2.5 rounded-xl border text-left transition-all ${
                     campaign.templateStyle === 'skeuomorphism'
-                      ? 'bg-amber-950/70 border-amber-400 text-amber-300 shadow-lg shadow-amber-950/40 ring-2 ring-amber-500/30 font-bold'
+                      ? 'bg-amber-950/70 border-amber-400 text-amber-300 shadow-lg ring-2 ring-amber-500/30 font-bold'
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
@@ -225,7 +308,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
                   onClick={() => setCampaign({ ...campaign, templateStyle: 'uitm_royal' })}
                   className={`p-2.5 rounded-xl border text-left transition-all ${
                     campaign.templateStyle === 'uitm_royal'
-                      ? 'bg-purple-950/80 border-purple-400 text-purple-300 shadow-lg shadow-purple-950/40 ring-2 ring-purple-500/30 font-bold'
+                      ? 'bg-purple-950/80 border-purple-400 text-purple-300 shadow-lg ring-2 ring-purple-500/30 font-bold'
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
@@ -239,7 +322,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
                   onClick={() => setCampaign({ ...campaign, templateStyle: 'cyber_clean' })}
                   className={`p-2.5 rounded-xl border text-left transition-all ${
                     campaign.templateStyle === 'cyber_clean'
-                      ? 'bg-sky-950/70 border-sky-400 text-sky-300 shadow-lg shadow-sky-950/40 ring-2 ring-sky-500/30 font-bold'
+                      ? 'bg-sky-950/70 border-sky-400 text-sky-300 shadow-lg ring-2 ring-sky-500/30 font-bold'
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
@@ -252,7 +335,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
             {/* Email Meta Details */}
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Tajuk Program / Mesyuarat</label>
+                <label className="text-xs font-bold text-slate-400 block mb-1">Tajuk Program / Mesyuarat *</label>
                 <input
                   type="text"
                   value={campaign.title}
@@ -263,7 +346,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Subjek Emel (Subject Line)</label>
+                <label className="text-xs font-bold text-slate-400 block mb-1">Subjek Emel (Subject Line) *</label>
                 <input
                   type="text"
                   value={campaign.subject}
@@ -273,23 +356,30 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
                 />
               </div>
 
+              {/* DATE PICKER & TIME PICKER FOR CAMPAIGN */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Tarikh Acara</label>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Tarikh Acara (Date Picker)</span>
+                  </label>
                   <input
-                    type="text"
+                    type="date"
                     value={campaign.eventDate}
                     onChange={(e) => setCampaign({ ...campaign, eventDate: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono-code"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Masa</label>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Masa Acara (Time Picker)</span>
+                  </label>
                   <input
-                    type="text"
+                    type="time"
                     value={campaign.eventTime}
                     onChange={(e) => setCampaign({ ...campaign, eventTime: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono-code"
                   />
                 </div>
               </div>
@@ -360,17 +450,166 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
                 />
               </div>
 
-              {/* Target Audience */}
-              <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Sasaran Penerima Emel:</label>
+              {/* TOPIK HEBAHAN (UNTUK PENAPISAN PELANGGAN NOTIS) */}
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                <label className="text-xs font-bold text-slate-300 block flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Filter className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Kategori / Topik Hebahan (Untuk Pelanggan):</span>
+                  </span>
+                  <span className="text-[10px] text-cyan-400 font-mono-code font-bold">Auto-Filter</span>
+                </label>
                 <select
-                  value={targetGroup}
-                  onChange={(e) => setTargetGroup(e.target.value as any)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  value={campaignCategory}
+                  onChange={(e) => setCampaignCategory(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
                 >
-                  <option value="all_members">Semua Ahli Berdaftar ({registrations.length} orang)</option>
-                  <option value="all_subscribers">Pelanggan Notis Sahaja ({subscribers.length} orang)</option>
+                  <option value="Semua Hebahan & Mesyuarat">Semua Hebahan & Mesyuarat (Semua Pelanggan Terima)</option>
+                  <option value="Pertandingan & Hackathon Sahaja">Pertandingan & Hackathon Sahaja</option>
+                  <option value="Bengkel & Bootcamps AI">Bengkel & Bootcamps AI</option>
+                  <option value="Promosi & Notis Khas">Promosi & Notis Khas</option>
                 </select>
+                <p className="text-[10px] text-slate-400 leading-relaxed">
+                  ℹ️ <strong>Peraturan Langganan:</strong> Jika topik dipilih, pelanggan notis hanya akan menerima emel ini sekiranya topik tersebut sepadan dengan minat langganan mereka.
+                </p>
+              </div>
+
+              {/* TARGET AUDIENCE SELECTION (ADA OPTION SEMUA / SELECT CHECKBOX) */}
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <label className="text-xs font-bold text-slate-300 block flex items-center justify-between font-mono-code">
+                  <span>SASARAN PENERIMA EMEL:</span>
+                  <span className="text-emerald-400 text-[10px]">{getCalculatedRecipientCount()} Penerima Layak</span>
+                </label>
+
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setTargetGroup('all')}
+                    className={`p-2 rounded-xl border text-left text-xs transition-all ${
+                      targetGroup === 'all'
+                        ? 'bg-indigo-600 text-white border-indigo-400 shadow-md font-bold'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <div className="font-bold">👥 Semua Penerima</div>
+                    <div className="text-[10px] opacity-80">Ahli + Pelanggan</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTargetGroup('all_members')}
+                    className={`p-2 rounded-xl border text-left text-xs transition-all ${
+                      targetGroup === 'all_members'
+                        ? 'bg-indigo-600 text-white border-indigo-400 shadow-md font-bold'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <div className="font-bold">🎓 Ahli Berdaftar</div>
+                    <div className="text-[10px] opacity-80">{registrations.length} orang</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTargetGroup('all_subscribers')}
+                    className={`p-2 rounded-xl border text-left text-xs transition-all ${
+                      targetGroup === 'all_subscribers'
+                        ? 'bg-indigo-600 text-white border-indigo-400 shadow-md font-bold'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <div className="font-bold">📬 Pelanggan Notis</div>
+                    <div className="text-[10px] opacity-80">{subscribers.length} orang (ikut topik)</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTargetGroup('select_custom')}
+                    className={`p-2 rounded-xl border text-left text-xs transition-all ${
+                      targetGroup === 'select_custom'
+                        ? 'bg-cyan-600 text-white border-cyan-400 shadow-md font-bold ring-2 ring-cyan-500/30'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <div className="font-bold">☑️ Pilih Tertentu</div>
+                    <div className="text-[10px] opacity-80">{selectedRecipientEmails.length} dipilih</div>
+                  </button>
+                </div>
+
+                {/* INTERACTIVE CHECKBOX SELECTOR PANEL */}
+                {targetGroup === 'select_custom' && (
+                  <div className="mt-3 p-3 rounded-xl bg-slate-900 border border-slate-700 space-y-2 animate-fadeIn">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="relative flex-1">
+                        <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+                        <input
+                          type="text"
+                          value={recipientSearch}
+                          onChange={(e) => setRecipientSearch(e.target.value)}
+                          placeholder="Cari nama, emel, no matrik..."
+                          className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-8 pr-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                        />
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={handleSelectAllRecipients}
+                          className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-cyan-300 font-mono-code font-bold"
+                        >
+                          Pilih Semua
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDeselectAllRecipients}
+                          className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-400 font-mono-code"
+                        >
+                          Padam Semua
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="max-h-40 overflow-y-auto space-y-1 pr-1 border-t border-slate-800 pt-2">
+                      {allAvailableRecipients.length === 0 ? (
+                        <div className="text-center py-2 text-xs text-slate-500">Tiada padanan dijumpai.</div>
+                      ) : (
+                        allAvailableRecipients.map((rec) => {
+                          const isChecked = selectedRecipientEmails.includes(rec.email);
+                          return (
+                            <div
+                              key={rec.email}
+                              onClick={() => handleToggleRecipient(rec.email)}
+                              className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors text-xs ${
+                                isChecked ? 'bg-cyan-950/60 border border-cyan-500/40' : 'bg-slate-950 hover:bg-slate-800/80 border border-transparent'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 truncate pr-2">
+                                {isChecked ? (
+                                  <CheckSquare className="w-4 h-4 text-cyan-400 shrink-0" />
+                                ) : (
+                                  <Square className="w-4 h-4 text-slate-600 shrink-0" />
+                                )}
+                                <div className="truncate">
+                                  <strong className="text-white block truncate">{rec.name}</strong>
+                                  <span className="text-[10px] text-slate-400 font-mono-code block truncate">
+                                    {rec.email}
+                                  </span>
+                                </div>
+                              </div>
+                              <span
+                                className={`px-2 py-0.5 rounded text-[9px] font-mono-code font-bold shrink-0 ${
+                                  rec.type === 'Ahli Berdaftar'
+                                    ? 'bg-purple-500/20 text-purple-300'
+                                    : 'bg-blue-500/20 text-blue-300'
+                                }`}
+                              >
+                                {rec.type}
+                              </span>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -542,17 +781,14 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
               {/* STYLE 3: SKEUOMORPHISM (Tactile Physical ID Badge with Chip) */}
               {campaign.templateStyle === 'skeuomorphism' && (
                 <div className="bg-[#fbfbfa] rounded-2xl border-2 border-[#d6d3d1] p-6 shadow-xl max-w-xl mx-auto space-y-4">
-                  {/* Lanyard Top Punch */}
                   <div className="flex justify-center -mt-8 mb-2">
                     <div className="w-14 h-4 bg-slate-300 rounded-full border border-slate-400 shadow-inner flex items-center justify-center">
                       <div className="w-8 h-1.5 bg-slate-600 rounded-full" />
                     </div>
                   </div>
 
-                  {/* Header with Metallic Chip */}
                   <div className="flex items-center justify-between pb-3 border-b border-stone-200">
                     <div className="flex items-center gap-3">
-                      {/* Gold Chip */}
                       <div className="w-9 h-7 rounded bg-gradient-to-tr from-amber-400 via-amber-200 to-amber-500 border border-amber-600 shadow-sm flex items-center justify-center">
                         <Cpu className="w-4 h-4 text-amber-900" />
                       </div>
@@ -674,7 +910,6 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
               {/* STYLE 5: UITM ROYAL PURPLE & GOLD MEMO */}
               {campaign.templateStyle === 'uitm_royal' && (
                 <div className="bg-white rounded-2xl border border-purple-200 overflow-hidden shadow-xl max-w-xl mx-auto space-y-4">
-                  {/* Dignified UiTM Royal Header Banner */}
                   <div className="bg-[#3b0764] text-white p-5 border-b-4 border-[#d97706]">
                     <div className="flex items-center justify-between">
                       <div>
@@ -826,7 +1061,7 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
         {/* Modal Bottom Actions */}
         <div className="pt-4 border-t border-slate-800 flex items-center justify-between shrink-0">
           <span className="text-xs text-slate-400">
-            {copiedHtml ? '✅ Kod template disalin' : `Akan dihantar ke ${targetGroup === 'all_members' ? registrations.length : subscribers.length} alamat emel`}
+            {copiedHtml ? '✅ Kod template disalin' : `Akan dihantar ke ${getCalculatedRecipientCount()} alamat emel yang layak`}
           </span>
           <div className="flex gap-2">
             <button
@@ -837,10 +1072,10 @@ export const ExcoEmailStudioModal: React.FC<ExcoEmailStudioModalProps> = ({
             </button>
             <button
               onClick={handleSendCampaign}
-              disabled={isBroadcasting}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold font-space transition-all shadow-lg shadow-purple-600/30 disabled:opacity-50"
+              disabled={isBroadcasting || getCalculatedRecipientCount() === 0}
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold font-space transition-all shadow-lg shadow-purple-600/30 disabled:opacity-50 cursor-pointer"
             >
-              <Send className="w-4 h-4" /> {isBroadcasting ? 'MENGHANTAR EMEL...' : `HANTAR EMEL KEPADA SEMUA PESERTA (${targetGroup === 'all_members' ? registrations.length : subscribers.length})`}
+              <Send className="w-4 h-4" /> {isBroadcasting ? 'MENGHANTAR EMEL...' : `HANTAR EMEL KEPADA ${getCalculatedRecipientCount()} PENERIMA`}
             </button>
           </div>
         </div>

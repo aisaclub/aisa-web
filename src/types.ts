@@ -26,6 +26,21 @@ export interface LecturerAdvisor {
   googleScholar?: string;
 }
 
+export const AI_RESEARCH_FIELDS = [
+  'Autonomous Agents & Large Language Models (LLM)',
+  'Computer Vision & Deep Learning (Image / Detection)',
+  'Smart Agriculture & Agrotech AI (IoT, Dron AI, Kesihatan Tanaman)',
+  'Network Security & AI-driven Cyber Defense',
+  'Enterprise Information Systems & Cloud AI',
+  'Reinforcement Learning & Edge AI / Robotics',
+  'Data Engineering & Predictive Analytics',
+  'Natural Language Processing (NLP) Bahasa Melayu & Dialek',
+  'AI Ethics, Governance & Model Safety',
+  'UI/UX & Web Development for AI Apps',
+] as const;
+
+export type AIResearchField = (typeof AI_RESEARCH_FIELDS)[number];
+
 export interface Announcement {
   id: string;
   title: string;
@@ -34,6 +49,7 @@ export interface Announcement {
   date: string;
   deadline?: string;
   bannerUrl: string;
+  bannerUrl2?: string; // Optional 2nd image/infographic
   location?: string;
   eventTime?: string;
   registrationLink?: string;
@@ -48,9 +64,11 @@ export interface Activity {
   category: 'Hackathon' | 'Workshop' | 'Lawatan Industri' | 'Seminar';
   summary: string;
   coverImage: string;
-  gallery: string[];
+  gallery: string[]; // up to 3 additional images (total 1-4 pictures)
   attendeesCount: number;
   highlightText: string;
+  aiField?: string;
+  location?: string;
 }
 
 export interface ClubRegistration {

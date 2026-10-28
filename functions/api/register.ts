@@ -179,3 +179,32 @@ export async function onRequestPatch(context: { request: Request; env: Env }) {
     });
   }
 }
+
+export async function onRequestDelete(context: { request: Request; env: Env }) {
+  try {
+    const url = new URL(context.request.url);
+    const id = url.searchParams.get('id');
+
+    if (!id) {
+      return new Response(JSON.stringify({ error: 'ID pendaftaran diperlukan' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const db = context.env.DB || (context.env as any)['context.env.DB'];
+    if (db) {
+      await db.prepare('DELETE FROM club_registrations WHERE id = ?').bind(id).run();
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, message: `Pendaftaran ${id} berjaya dipadam daripada sistem.` }),
+      { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+    );
+  } catch (error: any) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
