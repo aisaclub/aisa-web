@@ -1,17 +1,14 @@
-name = "aisa-uitm-web"
-compatibility_date = "2026-10-01"
+name = "aisa-web"
+compatibility_date = "2024-09-23"
 pages_build_output_dir = "dist"
 
 # ==============================================================================
-# Cloudflare D1 Database Binding
-# Untuk Cloudflare Pages:
-# Paling mudah & stabil adalah link terus di Cloudflare Dashboard:
-# Dashboard > Workers & Pages > aisa-web > Settings > Functions > D1 database bindings
-# Variable name: DB -> Pilih database: aisa-db
-#
-# (Nota: Jangan biarkan placeholder UUID dummy aktif kerana Wrangler deploy akan gagal)
+# Cloudflare D1 Database Binding Rasmi AISA Club
+# Database Name: aisaclub
+# Database ID: 76d5c84e-e67e-48b8-89dc-03745574c676
 # ==============================================================================
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "aisa-db"
-# database_id = "MASUKKAN_REAL_D1_UUID_JIKA_GUNA_CLI"
+[[d1_databases]]
+binding = "DB"
+database_name = "aisaclub"
+database_id = "76d5c84e-e67e-48b8-89dc-03745574c676"
+migrations_dir = "migrations"
