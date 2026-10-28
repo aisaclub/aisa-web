@@ -1,90 +1,295 @@
-# AISA UiTM Melaka (Kampus Jasin) - Official Web Portal
+<div align="center">
 
-Laman web rasmi **Artificial Intelligence Student Association (AISA)**, persatuan di bawah naungan Kolej Pengajian Pengkomputeran, Informatik & Matematik (KPPIM / FSKM), UiTM Cawangan Melaka Kampus Jasin.
+```
+   █████╗ ██╗███████╗ █████╗     ██╗   ██╗██╗████████╗███╗   ███╗
+  ██╔══██╗██║██╔════╝██╔══██╗    ██║   ██║██║╚══██╔══╝████╗ ████║
+  ███████║██║███████╗███████║    ██║   ██║██║   ██║   ██╔████╔██║
+  ██╔══██║██║╚════██║██╔══██║    ██║   ██║██║   ██║   ██║╚██╔╝██║
+  ██║  ██║██║███████║██║  ██║    ╚██████╔╝██║   ██║   ██║ ╚═╝ ██║
+  ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝     ╚═════╝ ╚═╝   ╚═╝   ╚═╝     ╚═╝
+   ARTIFICIAL INTELLIGENCE STUDENT ASSOCIATION • UITM MELAKA
+```
 
-Dibina dengan reka bentuk futuristik AI, interaktif 3D Three.js, mini-game latihan model AI, carta organisasi berhierarki (Tree Chart), pengurusan hebahan & arkib aktiviti, serta bersedia untuk dihoskan secara percuma di **Cloudflare Pages**.
+# 🏛️ AISA Official Web Portal & Edge Ecosystem
+### Kolej Pengajian Pengkomputeran, Informatik dan Matematik (KPPIM) • Kampus Jasin
 
----
+[![Cloudflare Pages](https://img.shields.io/badge/Deployed%20on-Cloudflare%20Pages-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
+[![Cloudflare D1](https://img.shields.io/badge/Database-Cloudflare%20D1%20SQLite-F38020?style=for-the-badge&logo=sqlite&logoColor=white)](https://developers.cloudflare.com/d1/)
+[![React 19](https://img.shields.io/badge/Frontend-React%2019%20%2B%20TypeScript-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Styling-Tailwind%20CSS%20v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Three.js](https://img.shields.io/badge/3D%20Graphics-Three.js-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
+[![UiTM Melaka](https://img.shields.io/badge/Affiliation-UiTM%20Jasin%20KPPIM-4B0082?style=for-the-badge)](https://melaka.uitm.edu.my/)
 
-## 🌟 Ciri-Ciri Utama
-
-1. **3D Interactive Hologram Neural Core (Three.js)**:
-   - Visual model AI 3D berputar yang bertindak balas dengan pergerakan tetikus dan klik (shockwave pulse).
-2. **Playable Mini-Game: "Neuro-Dash: Epoch Rush"**:
-   - Game arked 60fps berasaskan HTML5 Canvas & Web Audio Synthesizer terus di dalam browser.
-   - Kawal drone AI mengutip data & kluster GPU, mengelak ralat bug, dan bersaing untuk high score!
-3. **15-Second Cinematic Teaser Reel**:
-   - Showcase pengenalan persatuan beranimasi dengan meter masa, beat equalizer dan sorotan pencapaian kelab.
-4. **Carta Organisasi Interaktif (Tree Chart & Grid View)**:
-   - Salasilah berhierarki: Penasihat Pensyarah -> Majlis Tertinggi (YDP, TYDP, SU, Bendahari) -> Ketua Biro -> Barisan Exco.
-   - Kad interaktif dengan modal profil lengkap, bidang minat AI, pautan LinkedIn & GitHub.
-5. **Hebahan & Pertandingan (Live Bulletin)**:
-   - Tapis mengikut kategori (Pertandingan, Bengkel, Hebahan, Notis).
-   - Kiraan tarikh tutup pendaftaran dan pautan terus ke Google Form pendaftaran.
-6. **Arkib Aktiviti Lepas & Galeri Foto**:
-   - Sorotan hackathon dan lawatan industri dengan fungsi *lightbox viewer* gambar resolusi tinggi.
-7. **Portal Kemas Kini Exco & Admin (Self-Service CMS)**:
-   - Log masuk Exco (Kod laluan demo: `aisa2026`).
-   - Tukar gambar, nama, jawatan dan maklumat profil Exco bila-bila masa — carta organisasi akan dikemas kini secara masa nyata!
-   - Tambah hebahan baru dan aktiviti lepas dengan mudah.
-   - Dilengkapi skrip SQL sedia ada untuk disalin ke **Cloudflare D1**.
+[🌐 Demo Langsung](#-cara-deploy-ke-cloudflare-pages-100-percuma) • [📑 Carta Organisasi](#-carta-organisasi--pensyarah-penasihat) • [📧 Email Studio Exco](#-exco-email-campaign-studio--multi-design-templates) • [🗄️ Cloudflare D1 Setup](#-integrasi-cloudflare-d1-serverless-database) • [🚀 Git Push Guide](#-arahan-push-ke-github-aisaclubaisa-web)
 
 ---
 
-## 🚀 Cara Menjalankan Projek di Komputer Sendiri (Localhost)
+</div>
 
-1. Buka folder projek di terminal / command prompt:
-   ```bash
-   cd C:\Users\ammar\.gemini\antigravity\scratch\aisa-uitm-web
-   ```
+## 📌 Ringkasan Eksekutif Projek
 
-2. Jalankan arahan pembangunan:
-   ```bash
-   npm run dev
-   ```
+Portal Web Rasmi **AISA (Artificial Intelligence Student Association)** UiTM Melaka Kampus Jasin dibangunkan khusus untuk menyatukan ekosistem mahasiswa AI, barisan pensyarah penasihat KPPIM, serta menyediakan sistem pengurusan persatuan secara bersepadu tanpa bergantung kepada borang pihak ketiga (*zero external Google Forms*).
 
-3. Buka pelayar web di `http://localhost:3000`.
+Sistem ini dioptimumkan untuk hos percuma berkelajuan tinggi di **Cloudflare Pages** dengan pangkalan data relasi teragih **Cloudflare D1 (Serverless SQLite)**.
+
+---
+
+## 🏗️ Seni Bina Sistem (Architecture Overview)
+
+```
+                           +------------------------------------------------+
+                           |          PENGGUNA / PELAWAT / MAHASISWA        |
+                           +------------------------------------------------+
+                                                  |
+                                                  v
+                   +---------------------------------------------------------------+
+                   |           CLOUDFLARE PAGES EDGE RUNTIME (Global CDN)          |
+                   |                                                               |
+                   |  +---------------------------------------------------------+  |
+                   |  |           Vite + React 19 + Tailwind CSS v4             |  |
+                   |  |  • 3D Geodesic Neural Mesh (Three.js WebGL)             |  |
+                   |  |  • Mini-Game 60fps "Neuro-Dash" (Canvas + Web Audio)    |  |
+                   |  |  • Carta Organisasi Hierarki (Penasihat -> MT -> Exco)  |  |
+                   |  |  • Pendaftaran Ahli Native (Auto Member ID Generator)  |  |
+                   |  |  • Langganan Notis Hebahan & Buletin Pintar             |  |
+                   |  |  • Exco Command Console & Live Multi-Template Email     |  |
+                   |  +---------------------------------------------------------+  |
+                   +---------------------------------------------------------------+
+                                                  |
+                         +------------------------+------------------------+
+                         |                                                 |
+                         v                                                 v
+           [POST /api/register]                              [POST /api/subscribe]
+           [POST /api/broadcast]                             [GET /api/announcements]
+                         |                                                 |
+                         +------------------------+------------------------+
+                                                  |
+                                                  v
+                   +---------------------------------------------------------------+
+                   |            CLOUDFLARE PAGES FUNCTIONS (/functions/api)        |
+                   |  • Auth & Request Validation                                  |
+                   |  • SQL Query Binding via env.DB                               |
+                   |  • Auto Email Notification Logger                             |
+                   +---------------------------------------------------------------+
+                                                  |
+                                                  v
+                   +---------------------------------------------------------------+
+                   |             CLOUDFLARE D1 (Serverless SQLite DB)              |
+                   |                                                               |
+                   |  [TABLES]                                                     |
+                   |  ├── subscribers       (Emel, Topik Pilihan, Status)          |
+                   |  ├── registrations     (Nama, No Pelajar, Program, ID Ahli)   |
+                   |  ├── email_logs        (Rekod Emel Dihantar, Template, Status)|
+                   |  ├── lecturer_advisors (Bilik, Waktu Konsultasi, Niche AI)    |
+                   |  ├── committee_members (YDP, Exco, Gambar, LinkedIn, GitHub)  |
+                   |  ├── announcements     (Notis, Pertandingan, Countdown)       |
+                   |  └── activities        (Hackathon, Arkib Gambar, Lightbox)    |
+                   +---------------------------------------------------------------+
+```
+
+---
+
+## 🌟 Ciri-Ciri Utama & Pengalaman Pengguna (UX/UI)
+
+### 1. 🌐 Public Experience Berprestij
+* **Geodesic Neural Hologram (Three.js)**: Elemen 3D sfera neural yang elegan dan tenang di bahagian Hero dengan tindak balas tetikus dan sentuhan (bukan sci-fi neon berlebihan, sebaliknya bertemakan *academic executive slate* `#0b0f19`).
+* **15-Second Cinematic Teaser Reel**: Modal sorotan persatuan beranimasi dengan meter masa, beat visualizer dan pencapaian kelab.
+* **Mini-Game Interaktif "Neuro-Dash: Epoch Rush"**: Game arked 60fps berasaskan HTML5 Canvas dengan efek bunyi Web Audio API Synthesizer tanpa fail audio luaran!
+
+### 2. 🌳 Carta Organisasi Hierarki & Barisan Pensyarah Penasihat
+* **Mod Dwi-Paparan**: Pilihan antara **Salasilah Pokok (Hierarchical Tree View)** dan **Grid Eksekutif**.
+* **Integrasi Pensyarah Penasihat KPPIM**: Memaparkan bilik pensyarah, waktu konsultasi, bidang kepakaran AI, dan emel rasmi UiTM.
+* **Kad Profil Interaktif**: Memaparkan butiran biro, projek GitHub, akaun LinkedIn, dan kepakaran khusus setiap Exco.
+
+### 3. 📝 Pendaftaran Ahli Native & Sistem Langganan Notis
+* **100% Borang Native (Bukan Google Form)**: Data dimasukkan terus ke Cloudflare D1.
+* **Auto-Generated Digital Membership ID**: Menjana ID unik (cth: `AISA-2026-8492`) dan kad keahlian digital.
+* **Peti Langganan Notis Sahaja (Bukan Ahli)**: Membolehkan pelajar luar dan komuniti kampus melanggan hebahan pertandingan dan bengkel secara spesifik. Setiap langganan merekodkan status penerimaan ke `email_logs`.
+
+### 4. ✉️ Exco Email Campaign Studio (3 Reka Bentuk Berbeza)
+Exco boleh menghantar notis mesyuarat atau hebahan dengan memilih 3 reka bentuk emel tersuai:
+1. **UiTM Royal Official Memo**: Reka bentuk rasmi surat pekeliling universiti lengkap dengan nombor rujukan, tandatangan YDP, dan kod etika KPPIM.
+2. **Tech Summit Modern Card**: Kad bergradien moden dengan kiraan masa, lencana topik AI, dan butang RSVP kalendar satu klik.
+3. **Minimalist Urgent Alert**: Format pekeliling ringkas berlatar belakang gelap untuk mesyuarat tergempar dan pembatalan kelas/bengkel.
+
+---
+
+## 🗄️ Integrasi Cloudflare D1 (Serverless Database)
+
+Portal ini menggunakan **Cloudflare D1** ([Dokumentasi Rasmi D1](https://developers.cloudflare.com/d1/)) untuk menyimpan semua data relasi secara global di edge.
+
+### Fail Konfigurasi & Migrasi:
+* [`wrangler.toml`](file:///./wrangler.toml) - Pengikatan binding pangkalan data `DB`.
+* [`migrations/0001_initial_schema.sql`](file:///./migrations/0001_initial_schema.sql) - Skema 7 jadual relasi lengkap berserta index & triggers.
+* [`migrations/0002_seed_data.sql`](file:///./migrations/0002_seed_data.sql) - Data awal pensyarah, exco, hebahan, dan aktiviti.
+* [`functions/api/`](file:///./functions/api/) - Endpoint serverless Pages Functions (`register.ts`, `subscribe.ts`, `broadcast.ts`).
+
+### Panduan Setup D1 Menggunakan Wrangler CLI:
+
+```bash
+# 1. Log masuk ke akaun Cloudflare anda
+npx wrangler login
+
+# 2. Cipta pangkalan data D1 bernama 'aisa-db'
+npx wrangler d1 create aisa-db
+```
+
+Output terminal akan memberikan `database_id`. Masukkan ID tersebut ke dalam fail `wrangler.toml`:
+
+```toml
+[[d1_databases]]
+binding = "DB"
+database_name = "aisa-db"
+database_id = "MASUKKAN-DATABASE-ID-ANDA-DI-SINI"
+migrations_dir = "migrations"
+```
+
+Jalankan migrasi skema dan data awal:
+
+```bash
+# Untuk pengujian setempat (Local testing):
+npx wrangler d1 migrations apply aisa-db --local
+
+# Untuk pelaksanaan di Cloudflare Edge sebenar (Production):
+npx wrangler d1 migrations apply aisa-db --remote
+```
+
+---
+
+## 🚀 Panduan Membangunkan & Menguji Setempat (Local Development)
+
+```bash
+# 1. Clone repositori
+git clone https://github.com/aisaclub/aisa-web.git
+cd aisa-web
+
+# 2. Pasang kebergantungan (Dependencies)
+npm install
+
+# 3. Jalankan server pembangunan Vite
+npm run dev
+
+# 4. Akses melalui browser di http://localhost:3000
+```
+
+Untuk menguji Pages Functions bersama Cloudflare D1 secara lokal:
+```bash
+npx wrangler pages dev dist --d1=DB=aisa-db
+```
 
 ---
 
 ## ☁️ Cara Deploy ke Cloudflare Pages (100% Percuma)
 
-### Kaedah A: Menggunakan GitHub (Paling Mudah & Disyorkan)
-1. Cipta repositori baru di akaun GitHub persatuan anda (cth: `aisa-uitm-portal`).
-2. Muat naik (push) kod ini ke GitHub:
+### Langkah Demi Langkah di Cloudflare Dashboard:
+1. Log masuk ke [Cloudflare Dashboard](https://dash.cloudflare.com/).
+2. Navigasi ke **Compute (Workers & Pages)** > **Create application** > **Pages** > **Connect to Git**.
+3. Pilih repositori `aisaclub/aisa-web`.
+4. Masukkan tetapan konfigurasi berikut:
+   * **Project Name**: `aisa-web`
+   * **Framework preset**: `Vite`
+   * **Build command**: `npm run build`
+   * **Build output directory**: `dist`
+5. Di bahagian **Settings** > **Functions** > **D1 database bindings**:
+   * **Variable name**: `DB`
+   * **D1 database**: Pilih `aisa-db`
+6. Tekan **Save and Deploy**. Laman web rasmi anda kini bersiaran di seluruh dunia dengan sokongan HTTPS automatik!
+
+---
+
+## 🐙 Arahan Push ke GitHub `aisaclub/aisa-web`
+
+Jika anda menghadapi ralat kebenaran (*Permission Denied 403*):
+```
+remote: Permission to aisaclub/aisa-web.git denied to ammarsyaathir.
+fatal: unable to access 'https://github.com/aisaclub/aisa-web.git/': The requested URL returned error: 403
+```
+
+Ia bermaksud akaun peribadi anda belum ditambah sebagai **Collaborator** atau tiada hak akses tulis (*Write Access*) dalam organisasi GitHub **`aisaclub`**.
+
+### Penyelesaian 1: Tambah Kolaborator di GitHub
+1. Pemilik organisasi `aisaclub` perlu membuka:  
+   `https://github.com/aisaclub/aisa-web/settings/access`
+2. Tekan **Add people** dan jemput username anda dengan kebenaran **Admin** atau **Write**.
+3. Terima jemputan di emel atau di `https://github.com/aisaclub/aisa-web/invitations`.
+4. Jalankan:
    ```bash
-   git init
-   git add .
-   git commit -m "Initial commit for AISA UiTM Jasin portal"
-   git remote add origin https://github.com/<organisasi-anda>/aisa-uitm-portal.git
    git push -u origin main
    ```
-3. Buka [Cloudflare Dashboard](https://dash.cloudflare.com/) > **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
-4. Tetapkan konfigurasi binaan:
-   - **Framework preset**: `Vite`
-   - **Build command**: `npm run build`
-   - **Build output directory**: `dist`
-5. Klik **Save and Deploy**. Laman web anda akan bersiaran secara langsung dalam masa kurang 1 minit dengan pautan seperti `https://aisa-uitm.pages.dev`!
 
-### Kaedah B: Menggunakan Wrangler CLI
-```bash
-npx wrangler pages deploy dist --project-name=aisa-uitm-web
+### Penyelesaian 2: Gunakan GitHub Personal Access Token (PAT)
+1. Pergi ke `https://github.com/settings/tokens?type=beta` (Fine-grained token) atau Classic Token.
+2. Jana token dengan kebenaran `repo` (Full control of private repositories).
+3. Jalankan arahan push dengan token:
+   ```bash
+   git push https://<TOKEN_ANDA>@github.com/aisaclub/aisa-web.git main
+   ```
+
+---
+
+## 📂 Struktur Fail Projek
+
+```
+aisa-uitm-web/
+├── .github/                       # CI/CD Workflows
+├── functions/                     # Cloudflare Pages Functions (Edge API)
+│   └── api/
+│       ├── broadcast.ts           # Exco Broadcast & Email Campaign API
+│       ├── register.ts            # Pendaftaran Keahlian Native API
+│       └── subscribe.ts           # Langganan Notis & Buletin API
+├── migrations/                    # Cloudflare D1 SQLite Migrations
+│   ├── 0001_initial_schema.sql    # D1 Tables Schema & Indices
+│   └── 0002_seed_data.sql         # Data Awal Pensyarah & Aktiviti
+├── public/                        # Aset Statik (Favicon, Logo, Peta)
+├── src/
+│   ├── components/                # Komponen UI React
+│   │   ├── ActivitiesSection.tsx  # Arkib Aktiviti & Lightbox Gallery
+│   │   ├── AdminPortalModal.tsx   # Dashboard Pengurusan Exco & Data Ahli
+│   │   ├── AIGame.tsx             # Mini-Game "Neuro-Dash" (60fps Canvas)
+│   │   ├── EmailTemplateModal.tsx # Preview Emel Pendaftaran Ahli
+│   │   ├── ExcoEmailStudioModal.tsx# Exco Email Campaign Studio (3 Tema)
+│   │   ├── Footer.tsx             # Footer & Pautan Rasmi UiTM
+│   │   ├── HebahanSection.tsx     # Papan Notis & Hebahan Pertandingan
+│   │   ├── Hero.tsx               # Hero Section & Quick Links
+│   │   ├── JoinUsSection.tsx      # Borang Pendaftaran & Langganan Notis
+│   │   ├── Navbar.tsx             # Navigasi & Status Edge Network
+│   │   ├── OrgTreeChart.tsx       # Carta Organisasi Pokok & Pensyarah
+│   │   ├── SocialIcons.tsx        # Ikon Vektor SVG
+│   │   ├── TeaserVideoModal.tsx   # Teaser Video Reel 15 Saat
+│   │   └── ThreeCanvas.tsx        # 3D Geodesic Neural Mesh (Three.js)
+│   ├── data/
+│   │   └── initialData.ts         # Data Awal Pensyarah KPPIM & Exco
+│   ├── services/
+│   │   └── api.ts                 # Service Client D1 + LocalStorage Fallback
+│   ├── types.ts                   # Skema Jenis Data TypeScript
+│   ├── App.tsx                    # Komponen Utama Aplikasi
+│   ├── main.tsx                   # Titik Masuk (Entry Point)
+│   └── style.css                  # Tema Slate-Navy & Animasi
+├── index.html                     # HTML Shell & Web Fonts
+├── package.json                   # Dependensi Projek
+├── tsconfig.json                  # Konfigurasi TypeScript
+├── vite.config.ts                 # Konfigurasi Vite & Tailwind CSS v4
+└── wrangler.toml                  # Konfigurasi Cloudflare Pages & D1 Binding
 ```
 
 ---
 
-## 🗄️ Menghubungkan ke Cloudflare D1 (Pangkalan Data Edge)
-Jika anda mahu data disimpan di pelayan Cloudflare dan bukan sekadar di browser:
-1. Cipta D1 database di Cloudflare:
-   ```bash
-   npx wrangler d1 create aisa-db
-   ```
-2. Salin `database_id` yang terhasil ke dalam fail `wrangler.toml`.
-3. Jalankan skema jadual:
-   ```bash
-   npx wrangler d1 execute aisa-db --file=./schema.sql
-   ```
+## 👥 Barisan Kepimpinan & Pensyarah Penasihat
+
+* **Ketua Pusat Pengajian / Penasihat Kehormat**: Ts. Dr. Mohd Hafiz Bin Mohd Yusof (Penyelidikan: AI Ethics & Machine Learning)
+* **Pensyarah Penasihat Kanan**: Dr. Siti Zubaidah Binti Ahmad (Penyelidikan: Deep Learning & Computer Vision)
+* **Yang Di-Pertua (YDP)**: Muhammad Danial Haikal (CS251 - Sains Komputer)
+* **Timbalan Yang Di-Pertua (TYDP)**: Nurul Izzah Farhana (CS245 - Kejuruteraan Sistem Maklumat)
 
 ---
 
-Dikeluarkan untuk **Artificial Intelligence Student Association (AISA)**, UiTM Melaka Kampus Jasin.
+<div align="center">
+
+**Artificial Intelligence Student Association (AISA)**  
+Kolej Pengajian Pengkomputeran, Informatik dan Matematik (KPPIM)  
+Universiti Teknologi MARA (UiTM) Cawangan Melaka Kampus Jasin  
+77300 Merlimau, Melaka, Malaysia  
+
+*Dicipta dengan dedikasi tinggi untuk melahirkan barisan jurutera AI terunggul negara.*
+
+</div>

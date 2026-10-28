@@ -29,7 +29,8 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
 
   // Subscribe notice state
   const [subscribeEmail, setSubscribeEmail] = useState('');
-  const [subscribeSuccess, setSubscribeSuccess] = useState(false);
+  const [subscribeTopic, setSubscribeTopic] = useState('Semua Hebahan & Mesyuarat');
+  const [subscribedNoticeModal, setSubscribedNoticeModal] = useState<NoticeSubscriber | null>(null);
 
   const handleSubmitRegistration = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,13 +73,19 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
       id: `sub-${Date.now()}`,
       email: subscribeEmail,
       subscribedAt: new Date().toISOString().split('T')[0],
-      preferredTopic: 'Semua Hebahan & Mesyuarat',
+      preferredTopic: subscribeTopic,
     };
 
     onSubscribeNotice(newSub);
-    setSubscribeSuccess(true);
+    setSubscribedNoticeModal(newSub);
     setSubscribeEmail('');
-    setTimeout(() => setSubscribeSuccess(false), 4000);
+
+    confetti({
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.7, x: 0.3 },
+      colors: ['#2563eb', '#7c3aed', '#10b981'],
+    });
   };
 
   return (
@@ -148,28 +155,35 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
                 Ingin terima hebahan pertandingan dan peluang latihan AI tanpa mendaftar sebagai ahli? Masukkan emel anda di sini:
               </p>
 
-              <form onSubmit={handleSubscribe} className="flex gap-2">
+              <form onSubmit={handleSubscribe} className="space-y-2">
                 <input
                   type="email"
                   value={subscribeEmail}
                   onChange={(e) => setSubscribeEmail(e.target.value)}
                   placeholder="emel.pelajar@isiswa.uitm.edu.my"
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
                   required
                 />
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs font-space transition-colors shrink-0 flex items-center gap-1"
-                >
-                  <Send className="w-3 h-3" /> Langgan
-                </button>
-              </form>
+                
+                <div className="flex gap-2">
+                  <select
+                    value={subscribeTopic}
+                    onChange={(e) => setSubscribeTopic(e.target.value)}
+                    className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-[11px] text-slate-300 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Semua Hebahan & Mesyuarat">Semua Hebahan & Mesyuarat</option>
+                    <option value="Pertandingan & Hackathon Sahaja">Pertandingan & Hackathon Sahaja</option>
+                    <option value="Bengkel & Bootcamps AI">Bengkel & Bootcamps AI</option>
+                  </select>
 
-              {subscribeSuccess && (
-                <div className="mt-2 text-[11px] font-mono-code text-emerald-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Terima kasih! Emel anda telah didaftarkan untuk notis rasmi.
+                  <button
+                    type="submit"
+                    className="px-4 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs font-space transition-colors shrink-0 flex items-center gap-1"
+                  >
+                    <Send className="w-3 h-3" /> Langgan Notis
+                  </button>
                 </div>
-              )}
+              </form>
             </div>
           </div>
 
@@ -376,6 +390,68 @@ export const JoinUsSection: React.FC<JoinUsSectionProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Modal Pengesahan Langganan Notis */}
+      {subscribedNoticeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="relative w-full max-w-md bg-slate-900 border border-cyan-500/30 rounded-3xl p-6 shadow-2xl text-center">
+            <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-cyan-500/20">
+              <CheckCircle2 className="w-7 h-7" />
+            </div>
+
+            <span className="px-3 py-1 rounded-full text-[10px] font-mono-code font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 mb-2 inline-block">
+              ⚡ DISIMPAN KE CLOUDFLARE D1
+            </span>
+
+            <h3 className="text-xl font-black text-white font-space mb-1">
+              Notis Pengesahan Dihantar!
+            </h3>
+
+            <p className="text-xs text-slate-300 leading-relaxed mb-4">
+              Terima kasih! Kami telah menghantar notis pengesahan ke emel <strong className="text-cyan-400 font-mono-code">{subscribedNoticeModal.email}</strong> bagi topik <strong className="text-white font-mono-code">{subscribedNoticeModal.preferredTopic}</strong>.
+            </p>
+
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-left text-xs mb-5 space-y-1">
+              <div className="text-[10px] text-slate-400 font-mono-code">STATUS SISTEM EMEL:</div>
+              <div className="text-white flex items-center gap-1.5 font-bold">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>Salinan notis dihantar & direkod dalam email_logs</span>
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-center">
+              <button
+                onClick={() => {
+                  const subscriberModal = subscribedNoticeModal;
+                  setSubscribedNoticeModal(null);
+                  onPreviewEmail({
+                    id: subscriberModal.id,
+                    fullName: 'Pelanggan Buletin AISA',
+                    studentId: 'Pelanggan Luar / Mahasiswa',
+                    email: subscriberModal.email,
+                    phoneNumber: '-',
+                    program: 'Langganan Notis Sahaja',
+                    semester: '-',
+                    aiInterest: subscriberModal.preferredTopic,
+                    registeredAt: subscriberModal.subscribedAt,
+                    membershipId: 'SUBSCRIBER-ACTIVE',
+                    status: 'Aktif',
+                  });
+                }}
+                className="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs font-space transition-colors"
+              >
+                Lihat Contoh Emel Buletin
+              </button>
+              <button
+                onClick={() => setSubscribedNoticeModal(null)}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold font-space"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

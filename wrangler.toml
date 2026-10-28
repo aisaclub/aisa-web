@@ -2,8 +2,13 @@ name = "aisa-uitm-web"
 compatibility_date = "2026-10-01"
 pages_build_output_dir = "dist"
 
-# Optional Cloudflare D1 Edge Database Binding
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "aisa-db"
-# database_id = "<your-d1-database-id-from-cloudflare-dash>"
+# ==============================================================================
+# Cloudflare D1 Database Binding
+# Untuk run: npx wrangler d1 create aisa-db
+# Masukkan database_id yang dijana di bawah ini
+# ==============================================================================
+[[d1_databases]]
+binding = "DB"
+database_name = "aisa-db"
+database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+migrations_dir = "migrations"
