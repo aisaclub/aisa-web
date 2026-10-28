@@ -14,6 +14,8 @@ interface AdminPortalModalProps {
   onAddActivity: (act: Activity) => void;
   onResetData: () => void;
   onTriggerEmailToMember: (member: ClubRegistration, template: 'welcome' | 'meeting' | 'notice') => void;
+  onOpenEmailStudio: () => void;
+  onUpdateRegStatus: (id: string, status: ClubRegistration['status'], assignedPic?: string) => void;
   initialEditMember?: CommitteeMember | null;
 }
 
@@ -29,6 +31,8 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
   onAddActivity,
   onResetData,
   onTriggerEmailToMember,
+  onOpenEmailStudio,
+  onUpdateRegStatus,
   initialEditMember,
 }) => {
   const [activeTab, setActiveTab] = useState<'profile' | 'registrations' | 'announcement' | 'activity' | 'subscribers' | 'cloudflare'>('profile');
@@ -370,21 +374,35 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
           {/* TAB 2: REGISTERED MEMBERS (JOIN US DATA) */}
           {activeTab === 'registrations' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-purple-950/40 via-indigo-950/40 to-slate-900 border border-purple-500/30">
                 <div>
-                  <h4 className="text-sm font-bold text-white font-space">
-                    Senarai Mahasiswa Yang Mendaftar Melalui Laman Web
+                  <h4 className="text-sm font-bold text-white font-space flex items-center gap-2">
+                    <span>Pengurusan Ahli & Konsol Emel Mesyuarat</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono-code bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">
+                      {registrations.length} Pelajar Berdaftar
+                    </span>
                   </h4>
-                  <p className="text-xs text-slate-400">
-                    Klik butang emel untuk menjana emel pengesahan atau peringatan mesyuarat automatik!
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Data masuk secara langsung daripada borang web tanpa sebarang Google Form. Exco boleh semak, tetapkan PIC, dan hantar emel mesyuarat.
                   </p>
                 </div>
-                <button
-                  onClick={handleExportCSV}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold font-mono-code transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5" /> Eksport ke CSV
-                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={onOpenEmailStudio}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold font-space transition-all shadow-lg shadow-purple-600/30 shrink-0"
+                  >
+                    <Send className="w-3.5 h-3.5" /> Buka Email Studio (Blast Mesyuarat)
+                  </button>
+
+                  <button
+                    onClick={handleExportCSV}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold font-mono-code transition-colors shrink-0"
+                    title="Muat Turun Senarai Ahli"
+                  >
+                    <Download className="w-3.5 h-3.5" /> CSV
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-slate-800">
@@ -392,11 +410,11 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                   <thead className="bg-slate-950 text-slate-400 font-mono-code border-b border-slate-800">
                     <tr>
                       <th className="p-3">ID Ahli</th>
-                      <th className="p-3">Nama Penuh</th>
-                      <th className="p-3">No. Pelajar</th>
-                      <th className="p-3">No. Tel</th>
+                      <th className="p-3">Nama & No. Matrik</th>
+                      <th className="p-3">No. Telefon</th>
                       <th className="p-3">Program</th>
-                      <th className="p-3">Minat AI</th>
+                      <th className="p-3">Status Permohonan</th>
+                      <th className="p-3">Exco PIC</th>
                       <th className="p-3 text-right">Tindakan Emel</th>
                     </tr>
                   </thead>
@@ -404,11 +422,42 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                     {registrations.map((reg) => (
                       <tr key={reg.id} className="hover:bg-slate-800/40 transition-colors">
                         <td className="p-3 font-mono-code text-cyan-400 font-bold">{reg.membershipId}</td>
-                        <td className="p-3 font-bold text-white">{reg.fullName}</td>
-                        <td className="p-3 font-mono-code text-slate-300">{reg.studentId}</td>
+                        <td className="p-3">
+                          <strong className="text-white block">{reg.fullName}</strong>
+                          <span className="text-[10px] text-slate-400 font-mono-code">{reg.studentId} • {reg.email}</span>
+                        </td>
                         <td className="p-3 font-mono-code text-slate-300">{reg.phoneNumber}</td>
-                        <td className="p-3 text-slate-300">{reg.program} ({reg.semester})</td>
-                        <td className="p-3 text-indigo-300 font-mono-code text-[11px]">{reg.aiInterest}</td>
+                        <td className="p-3 text-slate-300">
+                          <span>{reg.program}</span>
+                          <span className="block text-[10px] text-indigo-400 font-mono-code">{reg.semester}</span>
+                        </td>
+                        <td className="p-3">
+                          <select
+                            value={reg.status}
+                            onChange={(e) => onUpdateRegStatus(reg.id, e.target.value as any, reg.assignedPic)}
+                            className="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-[11px] font-mono-code text-white focus:outline-none focus:border-indigo-500"
+                          >
+                            <option value="Baru">🟡 Baru</option>
+                            <option value="Disemak">🔵 Disemak</option>
+                            <option value="Lulus">🟢 Lulus</option>
+                            <option value="Perlu Dihubungi">🔴 Perlu Dihubungi</option>
+                          </select>
+                        </td>
+                        <td className="p-3">
+                          <select
+                            value={reg.assignedPic || 'Belum Ditetapkan'}
+                            onChange={(e) => onUpdateRegStatus(reg.id, reg.status, e.target.value)}
+                            className="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-slate-300 focus:outline-none focus:border-indigo-500"
+                          >
+                            <option value="Belum Ditetapkan">- Pilih PIC -</option>
+                            <option value="Muhammad Faris (YDP)">Muhammad Faris (YDP)</option>
+                            <option value="Nur Aisyah (TYDP)">Nur Aisyah (TYDP)</option>
+                            <option value="Wan Amirul (SU)">Wan Amirul (SU)</option>
+                            <option value="Siti Sarah (Bendahari)">Siti Sarah (Bendahari)</option>
+                            <option value="Harith Iskandar (Ketua AI)">Harith Iskandar (Ketua AI)</option>
+                            <option value="Alia Maisarah (Ketua Media)">Alia Maisarah (Ketua Media)</option>
+                          </select>
+                        </td>
                         <td className="p-3 text-right space-x-1">
                           <button
                             onClick={() => onTriggerEmailToMember(reg, 'welcome')}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Announcement } from '../types';
-import { Bell, Calendar, ExternalLink, Flame, Plus, Trash2, Tag, CheckCircle2 } from 'lucide-react';
+import { Bell, Calendar, ExternalLink, Flame, Plus, Trash2, Tag, CheckCircle2, ChevronRight } from 'lucide-react';
 
 interface HebahanSectionProps {
   announcements: Announcement[];
@@ -132,15 +132,13 @@ export const HebahanSection: React.FC<HebahanSectionProps> = ({
                 </div>
 
                 <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between mt-auto">
-                  {item.registrationLink ? (
+                  {item.status === 'Open' ? (
                     <a
-                      href={item.registrationLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600/80 hover:bg-indigo-600 text-white text-xs font-bold font-space transition-colors"
+                      href="#join-us"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold font-space transition-colors"
                     >
-                      <span>DAFTAR SEKARANG</span>
-                      <ExternalLink className="w-3 h-3" />
+                      <span>DAFTAR PENYERTAAN</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </a>
                   ) : (
                     <span className="text-xs text-slate-400 italic">Notis Dalaman</span>

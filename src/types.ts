@@ -16,7 +16,7 @@ export interface CommitteeMember {
 export interface LecturerAdvisor {
   id: string;
   name: string;
-  title: string; // e.g. 'Ketua Penasihat', 'Penasihat Teknikal AI'
+  title: string;
   faculty: string;
   room: string;
   email: string;
@@ -29,11 +29,13 @@ export interface LecturerAdvisor {
 export interface Announcement {
   id: string;
   title: string;
-  category: 'Pertandingan' | 'Bengkel' | 'Hebahan' | 'Notis Penting';
+  category: 'Pertandingan' | 'Bengkel' | 'Hebahan' | 'Mesyuarat' | 'Notis Penting';
   description: string;
   date: string;
   deadline?: string;
   bannerUrl: string;
+  location?: string;
+  eventTime?: string;
   registrationLink?: string;
   isUrgent?: boolean;
   status: 'Open' | 'Closed' | 'Coming Soon';
@@ -62,7 +64,9 @@ export interface ClubRegistration {
   aiInterest: string;
   registeredAt: string;
   membershipId: string;
-  status: 'Aktif' | 'Menunggu Pengesahan';
+  status: 'Baru' | 'Disemak' | 'Lulus' | 'Perlu Dihubungi' | 'Aktif';
+  assignedPic?: string; // Exco bertugas yang ambil tahu pasal permohonan ini
+  excoNotes?: string;   // Catatan Exco
 }
 
 export interface NoticeSubscriber {
@@ -70,4 +74,21 @@ export interface NoticeSubscriber {
   email: string;
   subscribedAt: string;
   preferredTopic: string;
+}
+
+export interface CustomEmailCampaign {
+  id: string;
+  title: string;
+  subject: string;
+  templateStyle: 'uitm_official' | 'modern_card' | 'minimal_alert';
+  senderRole: string; // cth: 'Setiausaha Kehormat AISA', 'Exco Akademik'
+  eventDate?: string;
+  eventTime?: string;
+  location?: string;
+  agendaItems: string[];
+  mainMessage: string;
+  actionButtonText: string;
+  actionButtonUrl: string;
+  sentAt?: string;
+  recipientCount?: number;
 }

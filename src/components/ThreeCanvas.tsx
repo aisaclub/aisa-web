@@ -204,11 +204,11 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({ onCoreClick }) => {
     <div 
       ref={mountRef} 
       className="w-full h-full cursor-pointer relative"
-      title="Klik untuk cetus Gelombang Neural!"
+      title="Klik untuk putaran interaktif"
     >
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-center pointer-events-none">
-        <span className="text-[10px] font-mono-code text-cyan-400/80 bg-slate-900/60 px-3 py-1 rounded-full border border-cyan-500/20 backdrop-blur-sm">
-          ⚡ 3D NEURAL CORE ACTIVE • KLIK UNTUK SHOCKWAVE
+        <span className="text-[10px] font-mono-code text-slate-300 bg-slate-900/80 px-3 py-1 rounded-full border border-slate-700 backdrop-blur-sm">
+          AISA INTERACTIVE 3D CORE
         </span>
       </div>
     </div>

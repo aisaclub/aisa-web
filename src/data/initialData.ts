@@ -187,7 +187,7 @@ export const initialAnnouncements: Announcement[] = [
     date: '2026-11-15',
     deadline: '10 Nov 2026',
     bannerUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80',
-    registrationLink: 'https://forms.gle/aisa-hackathon-2026',
+    registrationLink: '#join-us',
     isUrgent: true,
     status: 'Open'
   },
@@ -199,7 +199,7 @@ export const initialAnnouncements: Announcement[] = [
     date: '2026-11-02',
     deadline: '31 Okt 2026',
     bannerUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-    registrationLink: 'https://forms.gle/aisa-workshop-edge',
+    registrationLink: '#join-us',
     status: 'Open'
   },
   {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { initialMembers, initialAnnouncements, initialActivities, initialAdvisors, initialRegistrations, initialSubscribers } from './data/initialData';
-import { CommitteeMember, Announcement, Activity, LecturerAdvisor, ClubRegistration, NoticeSubscriber } from './types';
+import { CommitteeMember, Announcement, Activity, LecturerAdvisor, ClubRegistration, NoticeSubscriber, CustomEmailCampaign } from './types';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { OrgTreeChart } from './components/OrgTreeChart';
@@ -11,6 +11,7 @@ import { AIGame } from './components/AIGame';
 import { TeaserVideoModal } from './components/TeaserVideoModal';
 import { AdminPortalModal } from './components/AdminPortalModal';
 import { EmailTemplateModal } from './components/EmailTemplateModal';
+import { ExcoEmailStudioModal } from './components/ExcoEmailStudioModal';
 import { Footer } from './components/Footer';
 import { Gamepad2, PlayCircle, ShieldCheck } from 'lucide-react';
 
@@ -53,6 +54,7 @@ export function App() {
   const [isGameOpen, setIsGameOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isAdminPortalOpen, setIsAdminPortalOpen] = useState(false);
+  const [isEmailStudioOpen, setIsEmailStudioOpen] = useState(false);
   const [editTargetMember, setEditTargetMember] = useState<CommitteeMember | null>(null);
 
   // Email Template Viewer State
@@ -140,6 +142,12 @@ export function App() {
 
   const handleSubscribeNotice = (newSub: NoticeSubscriber) => {
     setSubscribers((prev) => [newSub, ...prev]);
+  };
+
+  const handleUpdateRegStatus = (id: string, status: ClubRegistration['status'], assignedPic?: string) => {
+    setRegistrations((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, status, assignedPic: assignedPic || r.assignedPic } : r))
+    );
   };
 
   const handleResetData = () => {
@@ -292,6 +300,8 @@ export function App() {
         onAddActivity={handleAddActivity}
         onResetData={handleResetData}
         onTriggerEmailToMember={handleTriggerEmailFromAdmin}
+        onOpenEmailStudio={() => setIsEmailStudioOpen(true)}
+        onUpdateRegStatus={handleUpdateRegStatus}
         initialEditMember={editTargetMember}
       />
 
@@ -303,6 +313,16 @@ export function App() {
         studentId={emailModal.studentId}
         membershipId={emailModal.membershipId}
         templateType={emailModal.templateType}
+      />
+
+      <ExcoEmailStudioModal
+        isOpen={isEmailStudioOpen}
+        onClose={() => setIsEmailStudioOpen(false)}
+        registrations={registrations}
+        subscribers={subscribers}
+        onLogCampaign={(camp) => {
+          console.log('Campaign broadcasted:', camp);
+        }}
       />
     </div>
   );
