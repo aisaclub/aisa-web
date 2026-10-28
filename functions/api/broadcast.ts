@@ -89,20 +89,29 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
         }
       }
 
-      // Log broadcast in email_logs
+      // Log broadcast in email_logs if db available
+    if (db) {
       const logId = `camp-log-${Date.now()}`;
-      await db.prepare(
-        'INSERT INTO email_logs (id, recipient_email, recipient_name, template_type, subject, sent_by) VALUES (?, ?, ?, ?, ?, ?)'
-      )
-        .bind(
-          logId,
-          `broadcast_${target}@aisa.uitm.edu.my`,
-          `Penerima (${uniqueEmails.length || campaign.recipientCount || 0} sasaran)`,
-          campaign.templateStyle || 'tech_summit',
-          campaign.subject,
-          context.env.RESEND_API_KEY ? `Resend API (${sentCount} Dihantar)` : 'Simulasi Exco D1'
+      try {
+        await db.prepare(
+          'INSERT INTO email_logs (id, recipient_email, recipient_name, template_type, subject, sent_by) VALUES (?, ?, ?, ?, ?, ?)'
         )
-        .run();
+          .bind(
+            logId,
+            `broadcast_${campaign.targetAudience || 'custom'}@aisa.uitm.edu.my`,
+            `Penerima (${uniqueEmails.length || campaign.recipientCount || 0} sasaran)`,
+            campaign.templateStyle || 'minimalist',
+            campaign.subject,
+            (context.env as any).GMAIL_RELAY_URL
+              ? `Gmail Relay (${sentCount} Dihantar)`
+              : context.env.RESEND_API_KEY
+              ? `Resend API (${sentCount} Dihantar)`
+              : 'Simulasi Exco D1'
+          )
+          .run();
+      } catch {
+        // Handled
+      }
     }
 
     return new Response(
