@@ -76,7 +76,7 @@
 /* 3. uitm_royal (UiTM Royal Imperial Amethyst & Gold)                        */
 /* -------------------------------------------------------------------------- */
 
-/* MODE 2: SOFT SLATE LIGHT (Refined Warm Ambient Slate, NOT Blinding White) */
+/* MODE 2: SOFT SLATE LIGHT (Warm Executive Paper Slate - NOT Neon or Blinding White) */
 .theme-soft_light {
   background-color: #f1f5f9 !important;
   color: #0f172a !important;
@@ -86,10 +86,9 @@
 .theme-soft_light main,
 .theme-soft_light section,
 .theme-soft_light .bg-slate-950,
-.theme-soft_light .bg-slate-900,
 .theme-soft_light .bg-\[\#070913\],
 .theme-soft_light .bg-\[\#0b0f19\] {
-  background-color: #f8fafc !important;
+  background-color: #f4f6f9 !important;
   color: #0f172a !important;
 }
 
@@ -107,38 +106,88 @@
   color: #475569 !important;
 }
 
+.theme-soft_light .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* Eliminate Neon Colors in Light Mode - Replace with Deep Executive Tones */
+.theme-soft_light .text-cyan-400,
+.theme-soft_light .text-cyan-300,
+.theme-soft_light .text-cyan-200 {
+  color: #0284c7 !important; /* Refined Deep Sapphire Blue, No Neon Glare */
+}
+
+.theme-soft_light .text-indigo-400,
+.theme-soft_light .text-indigo-300 {
+  color: #4338ca !important; /* Crisp Royal Indigo */
+}
+
+.theme-soft_light .text-purple-400,
+.theme-soft_light .text-purple-300 {
+  color: #6b21a8 !important; /* Deep Imperial Amethyst */
+}
+
+.theme-soft_light .text-emerald-400,
+.theme-soft_light .text-emerald-300 {
+  color: #047857 !important; /* Forest Emerald */
+}
+
+/* High-Contrast Corporate Gradient Headline in Light Mode */
+.theme-soft_light .bg-clip-text {
+  background-image: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #0369a1 100%) !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Clean Paper Surface Cards with Subtle Borders (No Neon Halos) */
 .theme-soft_light .glass-panel {
-  background: rgba(255, 255, 255, 0.94) !important;
-  border-color: rgba(203, 213, 225, 0.85) !important;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06) !important;
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 4px -1px rgba(15, 23, 42, 0.03) !important;
 }
 
 .theme-soft_light .glass-panel-hover:hover {
   background: #ffffff !important;
-  border-color: rgba(99, 102, 241, 0.5) !important;
-  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.1) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Remove Distracting Glows and Halos in Light Mode */
+.theme-soft_light .glow-indigo,
+.theme-soft_light .glow-cyan {
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+}
+
+.theme-soft_light .blur-\[120px\],
+.theme-soft_light .blur-\[140px\] {
+  opacity: 0.08 !important;
 }
 
 .theme-soft_light .border-slate-800,
 .theme-soft_light .border-slate-900,
-.theme-soft_light .border-white\/5 {
-  border-color: rgba(226, 232, 240, 0.95) !important;
+.theme-soft_light .border-white\/5,
+.theme-soft_light .border-indigo-500\/30,
+.theme-soft_light .border-cyan-500\/30 {
+  border-color: #e2e8f0 !important;
+}
+
+.theme-soft_light .bg-slate-900,
+.theme-soft_light .bg-slate-900\/90,
+.theme-soft_light .bg-slate-950\/60,
+.theme-soft_light .bg-slate-950\/70,
+.theme-soft_light .bg-slate-950\/80 {
+  background-color: #ffffff !important;
 }
 
 .theme-soft_light nav {
-  background-color: rgba(248, 250, 252, 0.95) !important;
-  border-bottom-color: rgba(226, 232, 240, 0.95) !important;
+  background-color: rgba(244, 246, 249, 0.95) !important;
+  border-bottom-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .theme-soft_light nav a,
 .theme-soft_light nav span {
   color: #1e293b;
-}
-
-.theme-soft_light .bg-slate-950\/60,
-.theme-soft_light .bg-slate-950\/70,
-.theme-soft_light .bg-slate-950\/80 {
-  background-color: #f1f5f9 !important;
 }
 
 .theme-soft_light input,

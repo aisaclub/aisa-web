@@ -63,12 +63,9 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
                 </a>
               </li>
               <li>
-                <button
-                  onClick={onOpenAdmin}
-                  className="hover:text-indigo-400 transition-colors flex items-center gap-1"
-                >
-                  <Shield className="w-3 h-3" /> Portal Kemas Kini Exco
-                </button>
+                <a href="#join-us" className="hover:text-cyan-400 transition-colors">
+                  Pendaftaran Ahli Baru
+                </a>
               </li>
             </ul>
           </div>
@@ -94,12 +91,24 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
           </div>
         </div>
 
-        {/* Bottom copyright */}
+        {/* Bottom Bar: Copyright & Discrete Exco Login Link (Bawah Sekali) */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} AISA UiTM Melaka Kampus Jasin. Hak Cipta Terpelihara.</p>
-          <p className="flex items-center gap-1">
-            Dibina dengan <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> untuk Komuniti AI Malaysia
-          </p>
+          
+          <div className="flex flex-wrap items-center gap-3 sm:gap-5">
+            <p className="flex items-center gap-1">
+              Dibina dengan <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> untuk Komuniti AI UiTM
+            </p>
+            <span className="text-slate-800 hidden sm:inline">|</span>
+            <button
+              onClick={onOpenAdmin}
+              className="text-slate-500 hover:text-indigo-400 hover:underline transition-colors flex items-center gap-1.5 font-mono-code text-[11px] py-1 px-2 rounded-lg hover:bg-slate-900/60"
+              title="Akses Portal Pengurusan & Log Masuk Exco AISA"
+            >
+              <Shield className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Log Masuk Exco</span>
+            </button>
+          </div>
         </div>
       </div>
     </footer>

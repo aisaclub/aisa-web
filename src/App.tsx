@@ -274,15 +274,46 @@ export function App() {
     }
   }, [themeMode]);
 
-  // 2. Modals and Admin State
+  // 2. Modals and View State
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
     return localStorage.getItem('aisa_is_admin') === 'true';
+  });
+  const [currentView, setCurrentView] = useState<'home' | 'admin'>(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#admin') {
+      return 'admin';
+    }
+    return 'home';
   });
   const [isGameOpen, setIsGameOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isAdminPortalOpen, setIsAdminPortalOpen] = useState(false);
   const [isEmailStudioOpen, setIsEmailStudioOpen] = useState(false);
   const [editTargetMember, setEditTargetMember] = useState<CommitteeMember | null>(null);
+
+  // Hash change listener for #admin direct link
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#admin') {
+        if (isAdmin) {
+          setCurrentView('admin');
+        } else {
+          const pass = prompt('Masukkan Kod Laluan Pentadbiran Exco AISA (Demo passcode: aisa2026):', 'aisa2026');
+          if (pass === 'aisa2026' || pass === 'admin') {
+            setIsAdmin(true);
+            setCurrentView('admin');
+          } else {
+            window.location.hash = '';
+            setCurrentView('home');
+          }
+        }
+      } else {
+        setCurrentView('home');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, [isAdmin]);
 
   // Email Template Viewer State
   const [emailModal, setEmailModal] = useState<{
@@ -318,14 +349,16 @@ export function App() {
   }, [isAdmin]);
 
   // Handlers
-  const handleToggleAdmin = () => {
+  const handleOpenAdminFromFooter = () => {
     if (isAdmin) {
-      setIsAdmin(false);
+      setCurrentView('admin');
+      window.location.hash = '#admin';
     } else {
-      const pass = prompt('Masukkan Kod Laluan Exco/Admin (Demo passcode: aisa2026):', 'aisa2026');
+      const pass = prompt('Masukkan Kod Laluan Pentadbiran Exco AISA (Demo passcode: aisa2026):', 'aisa2026');
       if (pass === 'aisa2026' || pass === 'admin') {
         setIsAdmin(true);
-        setIsAdminPortalOpen(true);
+        setCurrentView('admin');
+        window.location.hash = '#admin';
       } else if (pass !== null) {
         alert('Kod laluan salah. Sila guna "aisa2026" untuk demo!');
       }
@@ -437,7 +470,8 @@ export function App() {
 
   const handleOpenEditMember = (member: CommitteeMember) => {
     setEditTargetMember(member);
-    setIsAdminPortalOpen(true);
+    setCurrentView('admin');
+    window.location.hash = '#admin';
   };
 
   const handleTriggerEmailFromAdmin = (reg: ClubRegistration, template: 'welcome' | 'meeting' | 'notice') => {
@@ -451,6 +485,66 @@ export function App() {
     });
   };
 
+  // RENDER DEDICATED EXCO ADMIN PAGE VIEW
+  if (currentView === 'admin') {
+    return (
+      <div className={`min-h-screen theme-${themeMode} bg-[#070913] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white transition-colors duration-200`}>
+        <AdminPortalModal
+          isOpen={true}
+          isPageMode={true}
+          themeMode={themeMode}
+          onThemeChange={setThemeMode}
+          onLogoutAdmin={() => {
+            setIsAdmin(false);
+            setCurrentView('home');
+            window.location.hash = '';
+          }}
+          onClose={() => {
+            setCurrentView('home');
+            window.location.hash = '';
+            setEditTargetMember(null);
+          }}
+          members={members}
+          registrations={registrations}
+          subscribers={subscribers}
+          advisors={advisors}
+          announcements={announcements}
+          activities={activities}
+          onUpdateMember={handleUpdateMember}
+          onAddAnnouncement={handleAddAnnouncement}
+          onAddActivity={handleAddActivity}
+          onResetData={handleResetData}
+          onTriggerEmailToMember={handleTriggerEmailFromAdmin}
+          onOpenEmailStudio={() => setIsEmailStudioOpen(true)}
+          onUpdateRegStatus={handleUpdateRegStatus}
+          onDeleteRegistration={handleDeleteRegistration}
+          initialEditMember={editTargetMember}
+        />
+
+        <EmailTemplateModal
+          isOpen={emailModal.isOpen}
+          onClose={() => setEmailModal((prev) => ({ ...prev, isOpen: false }))}
+          recipientName={emailModal.name}
+          recipientEmail={emailModal.email}
+          studentId={emailModal.studentId}
+          membershipId={emailModal.membershipId}
+          templateType={emailModal.templateType}
+        />
+
+        <ExcoEmailStudioModal
+          isOpen={isEmailStudioOpen}
+          onClose={() => setIsEmailStudioOpen(false)}
+          registrations={registrations}
+          subscribers={subscribers}
+          onLogCampaign={(camp) => {
+            console.log('Campaign broadcasted:', camp);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // RENDER PUBLIC HOME LANDING PAGE
   return (
     <div className={`min-h-screen theme-${themeMode} bg-[#070913] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white transition-colors duration-200`}>
       {/* Top Banner if in Admin Mode */}
@@ -458,28 +552,26 @@ export function App() {
         <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 text-slate-950 font-bold font-mono-code text-[11px] py-1 px-4 text-center flex items-center justify-center gap-2 shadow-lg">
           <ShieldCheck className="w-4 h-4" />
           <span>
-            [MOD ADMIN & EXCO DIAKTIFKAN] Klik mana-mana kad Exco untuk kemas kini info terus!
+            [MOD ADMIN & EXCO DIAKTIFKAN]
           </span>
           <span className="hidden sm:inline-flex items-center gap-1 bg-black/30 text-white px-2 py-0.5 rounded-full text-[10px]">
             <Database className="w-3 h-3 text-emerald-300" />
             {isD1Connected ? 'Cloudflare D1 SQL (aisaclub) Live' : 'Menyambung D1...'}
           </span>
           <button
-            onClick={() => setIsAdminPortalOpen(true)}
+            onClick={() => {
+              setCurrentView('admin');
+              window.location.hash = '#admin';
+            }}
             className="ml-2 underline hover:text-white font-black"
           >
-            Buka Portal
+            Buka Halaman Portal Exco →
           </button>
         </div>
       )}
 
-      {/* Navbar */}
+      {/* Navbar: Clean with only Logo, Nav Links and Theme Switcher */}
       <Navbar
-        isAdmin={isAdmin}
-        onToggleAdmin={handleToggleAdmin}
-        onOpenGame={() => setIsGameOpen(true)}
-        onOpenVideo={() => setIsVideoOpen(true)}
-        onOpenAdminPortal={() => setIsAdminPortalOpen(true)}
         themeMode={themeMode}
         onThemeChange={setThemeMode}
       />
@@ -503,7 +595,8 @@ export function App() {
           isAdmin={isAdmin}
           onAddNew={() => {
             setEditTargetMember(null);
-            setIsAdminPortalOpen(true);
+            setCurrentView('admin');
+            window.location.hash = '#admin';
           }}
           onDelete={handleDeleteAnnouncement}
         />
@@ -513,7 +606,8 @@ export function App() {
           isAdmin={isAdmin}
           onAddNew={() => {
             setEditTargetMember(null);
-            setIsAdminPortalOpen(true);
+            setCurrentView('admin');
+            window.location.hash = '#admin';
           }}
         />
 
@@ -533,54 +627,12 @@ export function App() {
         />
       </main>
 
-      {/* Floating Action Quick Access (Bottom Right) */}
-      <div className="fixed bottom-6 right-6 z-30 flex flex-col gap-2.5">
-        <button
-          onClick={() => setIsGameOpen(true)}
-          className="p-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-110 active:scale-95 text-white shadow-xl shadow-indigo-600/30 transition-transform group flex items-center gap-2"
-          title="Main Cyber Mini-Game AISA"
-        >
-          <Gamepad2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-          <span className="hidden md:inline text-xs font-bold font-space">Game AI</span>
-        </button>
+      {/* Footer: Discrete Log Masuk Exco at bottom-most bar */}
+      <Footer onOpenAdmin={handleOpenAdminFromFooter} />
 
-        <button
-          onClick={() => setIsVideoOpen(true)}
-          className="p-3.5 rounded-2xl bg-slate-900 border border-slate-700 hover:border-cyan-400 hover:scale-110 active:scale-95 text-cyan-400 shadow-xl transition-all group flex items-center gap-2"
-          title="Tonton 15s Club Teaser"
-        >
-          <PlayCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          <span className="hidden md:inline text-xs font-bold font-space text-slate-200">Teaser 15s</span>
-        </button>
-      </div>
-
-      {/* Footer */}
-      <Footer onOpenAdmin={() => setIsAdminPortalOpen(true)} />
-
-      {/* Modals */}
+      {/* Interactive Modals */}
       <AIGame isOpen={isGameOpen} onClose={() => setIsGameOpen(false)} />
       <TeaserVideoModal isOpen={isVideoOpen} onClose={() => setIsVideoOpen(false)} />
-      
-      <AdminPortalModal
-        isOpen={isAdminPortalOpen}
-        onClose={() => {
-          setIsAdminPortalOpen(false);
-          setEditTargetMember(null);
-        }}
-        members={members}
-        registrations={registrations}
-        subscribers={subscribers}
-        advisors={advisors}
-        onUpdateMember={handleUpdateMember}
-        onAddAnnouncement={handleAddAnnouncement}
-        onAddActivity={handleAddActivity}
-        onResetData={handleResetData}
-        onTriggerEmailToMember={handleTriggerEmailFromAdmin}
-        onOpenEmailStudio={() => setIsEmailStudioOpen(true)}
-        onUpdateRegStatus={handleUpdateRegStatus}
-        onDeleteRegistration={handleDeleteRegistration}
-        initialEditMember={editTargetMember}
-      />
 
       <EmailTemplateModal
         isOpen={emailModal.isOpen}

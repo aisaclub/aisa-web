@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CommitteeMember, Announcement, Activity, ClubRegistration, NoticeSubscriber, LecturerAdvisor, AI_RESEARCH_FIELDS } from '../types';
-import { X, Save, User, Bell, History, Database, Check, Users, Mail, Send, Download, Sparkles, RefreshCw, GraduationCap, Trash2, Upload, Image as ImageIcon, Calendar, Clock, MapPin, Award, Cpu, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { CommitteeMember, Announcement, Activity, ClubRegistration, NoticeSubscriber, LecturerAdvisor, AI_RESEARCH_FIELDS, WebThemeMode } from '../types';
+import { X, Save, User, Bell, History, Database, Check, Users, Mail, Send, Download, Sparkles, RefreshCw, GraduationCap, Trash2, Upload, Image as ImageIcon, Calendar, Clock, MapPin, Award, Cpu, AlertTriangle, CheckCircle2, ArrowLeft, LogOut, Moon, Sun, Crown, Shield } from 'lucide-react';
 import { formatMalayDate } from '../utils/dateFormatter';
 
 interface AdminPortalModalProps {
@@ -19,6 +19,12 @@ interface AdminPortalModalProps {
   onUpdateRegStatus: (id: string, status: ClubRegistration['status'], assignedPic?: string) => void;
   onDeleteRegistration: (id: string) => void;
   initialEditMember?: CommitteeMember | null;
+  isPageMode?: boolean;
+  themeMode?: WebThemeMode;
+  onThemeChange?: (mode: WebThemeMode) => void;
+  onLogoutAdmin?: () => void;
+  announcements?: Announcement[];
+  activities?: Activity[];
 }
 
 export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
@@ -37,6 +43,12 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
   onUpdateRegStatus,
   onDeleteRegistration,
   initialEditMember,
+  isPageMode = false,
+  themeMode,
+  onThemeChange,
+  onLogoutAdmin,
+  announcements = [],
+  activities = [],
 }) => {
   const [activeTab, setActiveTab] = useState<'profile' | 'registrations' | 'announcement' | 'activity' | 'subscribers' | 'cloudflare'>('profile');
 
@@ -266,29 +278,106 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-5xl max-h-[92vh] bg-slate-900 border border-indigo-500/30 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col overflow-hidden">
+    <div
+      className={
+        isPageMode
+          ? 'min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col transition-colors'
+          : 'fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn'
+      }
+    >
+      <div
+        className={
+          isPageMode
+            ? 'relative w-full bg-slate-900/90 border border-indigo-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col'
+            : 'relative w-full max-w-5xl max-h-[92vh] bg-slate-900 border border-indigo-500/30 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col overflow-hidden'
+        }
+      >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2.5 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
-              <Database className="w-5 h-5" />
-            </span>
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-white font-space">
-                PORTAL PENGURUSAN EXCO & ADMIN AISA
-              </h3>
-              <p className="text-xs text-slate-400">
-                Pusat kemas kini carta organisasi, pendaftaran ahli, auto-save pintar & arkib aktiviti.
-              </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-4 shrink-0">
+          <div className="flex items-center gap-3">
+            {isPageMode && (
+              <button
+                onClick={onClose}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold font-mono-code transition-colors border border-slate-700 shadow-sm"
+                title="Kembali ke Laman Web Utama"
+              >
+                <ArrowLeft className="w-4 h-4 text-cyan-400" />
+                <span>Laman Utama</span>
+              </button>
+            )}
+            <div className="flex items-center gap-2.5">
+              <span className="p-2.5 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+                <Database className="w-5 h-5" />
+              </span>
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-white font-space flex items-center gap-2">
+                  <span>PORTAL PENGURUSAN EXCO & ADMIN AISA</span>
+                  <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    D1 Live
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Pusat kemas kini carta organisasi, pendaftaran ahli, auto-save pintar & arkib aktiviti UiTM Jasin.
+                </p>
+              </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
-          >
-            <X className="w-5 h-5" />
-          </button>
+
+          <div className="flex items-center gap-2">
+            {isPageMode && themeMode && onThemeChange && (
+              <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 gap-1" title="Tukar Tema Paparan">
+                <button
+                  onClick={() => onThemeChange('cyber_dark')}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono-code font-bold ${
+                    themeMode === 'cyber_dark' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Mod Gelap"
+                >
+                  <Moon className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Gelap</span>
+                </button>
+                <button
+                  onClick={() => onThemeChange('soft_light')}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono-code font-bold ${
+                    themeMode === 'soft_light' ? 'bg-slate-200 text-slate-950' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Mod Cerah"
+                >
+                  <Sun className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Cerah</span>
+                </button>
+                <button
+                  onClick={() => onThemeChange('uitm_royal')}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono-code font-bold ${
+                    themeMode === 'uitm_royal' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Mod Diraja"
+                >
+                  <Crown className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Diraja</span>
+                </button>
+              </div>
+            )}
+
+            {isPageMode && onLogoutAdmin ? (
+              <button
+                onClick={onLogoutAdmin}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-mono-code transition-colors"
+                title="Log keluar sesi pentadbiran Exco"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log Keluar</span>
+              </button>
+            ) : (
+              <button
+                onClick={onClose}
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+                title="Tutup Modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Notification Toast */}
@@ -296,6 +385,32 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
           <div className="mt-3 p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs font-bold font-mono-code flex items-center gap-2">
             <Check className="w-4 h-4 shrink-0" />
             <span>{notification}</span>
+          </div>
+        )}
+
+        {/* Quick Executive Stats if in Page Mode */}
+        {isPageMode && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-4">
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <span className="text-[10px] font-mono-code text-slate-400 block mb-1">AHLI BERDAFTAR</span>
+              <span className="text-2xl font-black font-space text-emerald-400">{registrations.length}</span>
+              <span className="text-[10px] text-slate-400 block mt-0.5">Disimpan di Cloudflare D1</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <span className="text-[10px] font-mono-code text-slate-400 block mb-1">HEBAHAN AKTIF</span>
+              <span className="text-2xl font-black font-space text-cyan-400">{announcements.length}</span>
+              <span className="text-[10px] text-slate-400 block mt-0.5">Pertandingan & Bengkel</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <span className="text-[10px] font-mono-code text-slate-400 block mb-1">ARKIB AKTIVITI</span>
+              <span className="text-2xl font-black font-space text-purple-400">{activities.length}</span>
+              <span className="text-[10px] text-slate-400 block mt-0.5">Program Sesi 2026</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <span className="text-[10px] font-mono-code text-slate-400 block mb-1">LANGGANAN BULETIN</span>
+              <span className="text-2xl font-black font-space text-indigo-400">{subscribers.length}</span>
+              <span className="text-[10px] text-slate-400 block mt-0.5">Notis Rasmi Mengikut Topik</span>
+            </div>
           </div>
         )}
 
@@ -368,8 +483,8 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
           </button>
         </div>
 
-        {/* Scrollable Tab Content */}
-        <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+        {/* Tab Content */}
+        <div className={isPageMode ? 'space-y-6 pt-2 pb-6' : 'flex-1 overflow-y-auto pr-2 space-y-4'}>
           {/* TAB 1: EXCO PROFILE UPDATE (LIVE PHOTO DISPLAY, AUTO-SAVE 3 DETIK, TIADA BUTTON SIMPAN) */}
           {activeTab === 'profile' && (
             <div className="space-y-4">
