@@ -324,40 +324,6 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {isPageMode && themeMode && onThemeChange && (
-              <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 gap-1" title="Tukar Tema Paparan">
-                <button
-                  onClick={() => onThemeChange('cyber_dark')}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono-code font-bold ${
-                    themeMode === 'cyber_dark' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
-                  }`}
-                  title="Mod Gelap"
-                >
-                  <Moon className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Gelap</span>
-                </button>
-                <button
-                  onClick={() => onThemeChange('soft_light')}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono-code font-bold ${
-                    themeMode === 'soft_light' ? 'bg-slate-200 text-slate-950' : 'text-slate-400 hover:text-white'
-                  }`}
-                  title="Mod Cerah"
-                >
-                  <Sun className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Cerah</span>
-                </button>
-                <button
-                  onClick={() => onThemeChange('uitm_royal')}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono-code font-bold ${
-                    themeMode === 'uitm_royal' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
-                  }`}
-                  title="Mod Diraja"
-                >
-                  <Crown className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Diraja</span>
-                </button>
-              </div>
-            )}
 
             {isPageMode && onLogoutAdmin ? (
               <button

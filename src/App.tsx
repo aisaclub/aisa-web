@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { initialMembers, initialAnnouncements, initialActivities, initialAdvisors, initialRegistrations, initialSubscribers } from './data/initialData';
-import { CommitteeMember, Announcement, Activity, LecturerAdvisor, ClubRegistration, NoticeSubscriber, CustomEmailCampaign, WebThemeMode } from './types';
+import { CommitteeMember, Announcement, Activity, LecturerAdvisor, ClubRegistration, NoticeSubscriber, CustomEmailCampaign } from './types';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { OrgTreeChart } from './components/OrgTreeChart';
@@ -257,22 +257,11 @@ export function App() {
     fetchD1Data();
   }, []);
 
-  // Theme Mode State (3 Modes: cyber_dark, soft_light, uitm_royal)
-  const [themeMode, setThemeMode] = useState<WebThemeMode>(() => {
-    return (localStorage.getItem('aisa_theme_mode') as WebThemeMode) || 'cyber_dark';
-  });
-
+  // Clean light base style
   useEffect(() => {
-    localStorage.setItem('aisa_theme_mode', themeMode);
-    document.documentElement.setAttribute('data-theme', themeMode);
-    if (themeMode === 'soft_light') {
-      document.body.className = 'theme-soft_light bg-[#f8fafc] text-slate-800';
-    } else if (themeMode === 'uitm_royal') {
-      document.body.className = 'theme-uitm_royal bg-[#120722] text-[#fdfaf3]';
-    } else {
-      document.body.className = 'bg-[#0b0f19] text-[#e2e8f0]';
-    }
-  }, [themeMode]);
+    document.documentElement.setAttribute('data-theme', 'soft_light');
+    document.body.className = 'bg-[#f8fafc] text-slate-900';
+  }, []);
 
   // 2. Modals and View State
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
@@ -488,12 +477,10 @@ export function App() {
   // RENDER DEDICATED EXCO ADMIN PAGE VIEW
   if (currentView === 'admin') {
     return (
-      <div className={`min-h-screen theme-${themeMode} bg-[#070913] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white transition-colors duration-200`}>
+      <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col selection:bg-purple-800 selection:text-white transition-colors duration-200">
         <AdminPortalModal
           isOpen={true}
           isPageMode={true}
-          themeMode={themeMode}
-          onThemeChange={setThemeMode}
           onLogoutAdmin={() => {
             setIsAdmin(false);
             setCurrentView('home');
@@ -546,10 +533,10 @@ export function App() {
 
   // RENDER PUBLIC HOME LANDING PAGE
   return (
-    <div className={`min-h-screen theme-${themeMode} bg-[#070913] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white transition-colors duration-200`}>
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col selection:bg-purple-800 selection:text-white transition-colors duration-200">
       {/* Top Banner if in Admin Mode */}
       {isAdmin && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 text-slate-950 font-bold font-mono-code text-[11px] py-1 px-4 text-center flex items-center justify-center gap-2 shadow-lg">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-emerald-700 text-white font-bold font-mono-code text-[11px] py-1.5 px-4 text-center flex items-center justify-center gap-2 shadow-sm">
           <ShieldCheck className="w-4 h-4" />
           <span>
             [MOD ADMIN & EXCO DIAKTIFKAN]
@@ -563,33 +550,25 @@ export function App() {
               setCurrentView('admin');
               window.location.hash = '#admin';
             }}
-            className="ml-2 underline hover:text-white font-black"
+            className="ml-2 underline hover:text-emerald-100 font-black cursor-pointer"
           >
             Buka Halaman Portal Exco →
           </button>
         </div>
       )}
 
-      {/* Navbar: Clean with only Logo, Nav Links and Theme Switcher */}
-      <Navbar
-        themeMode={themeMode}
-        onThemeChange={setThemeMode}
-      />
+      {/* Navbar: Clean Academic Header */}
+      <Navbar />
 
-      {/* Main Content Sections */}
+      {/* Main Content Sections: Latest Notices directly on the first page flow */}
       <main className="flex-1">
+        {/* 1. Hero with Latest Featured Notice Card and Urgent Flash Ticker */}
         <HeroSection
-          onOpenGame={() => setIsGameOpen(true)}
+          latestAnnouncement={announcements[0]}
           onOpenVideo={() => setIsVideoOpen(true)}
         />
 
-        <OrgTreeChart
-          members={members}
-          advisorsList={advisors}
-          isAdmin={isAdmin}
-          onEditMember={handleOpenEditMember}
-        />
-
+        {/* 2. Full Hebahan & Notis Terkini section immediately beneath Hero */}
         <HebahanSection
           announcements={announcements}
           isAdmin={isAdmin}
@@ -601,6 +580,7 @@ export function App() {
           onDelete={handleDeleteAnnouncement}
         />
 
+        {/* 3. Arkib Aktiviti & Showcase Bengkel */}
         <ActivitiesSection
           activities={activities}
           isAdmin={isAdmin}
@@ -611,6 +591,15 @@ export function App() {
           }}
         />
 
+        {/* 4. Carta Organisasi & Direktori Exco & Pensyarah */}
+        <OrgTreeChart
+          members={members}
+          advisorsList={advisors}
+          isAdmin={isAdmin}
+          onEditMember={handleOpenEditMember}
+        />
+
+        {/* 5. Borang Pendaftaran & Faedah Keahlian */}
         <JoinUsSection
           onRegister={handleRegisterMember}
           onSubscribeNotice={handleSubscribeNotice}
